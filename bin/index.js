@@ -4,7 +4,7 @@ var requireDir = require('require-dir');
 var express = require('express');
 var Server = require('socket.io');
 var io = new Server();
-var SMILA = require('../src/SMILA/SMILA.js');
+require('../src/SMILA/SMILA.js');
 var requireDir = require('require-dir');
 var fmt = require('util').format;
 var util = require('util');
@@ -12,7 +12,7 @@ var util = require('util');
 module.exports = function()
 {
 	var app = express();
-	var smila = SMILA("SMILA");
+	var smila = new SMILA("SMILA");
 
 	app.get('/', function(req, res)
 	{
@@ -79,7 +79,6 @@ module.exports = function()
 		var msg = fmt('SMILA IS Running on %s:%d.\n', s.localAddress, s.localPort);
 		msg = msg + "\nSMILA:\n" + util.inspect(SMILA, false, null);
 		res.send(msg);
-
 	});
 
 	io.on('connection', function(socket)
