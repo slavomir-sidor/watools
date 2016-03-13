@@ -1,18 +1,18 @@
 'use strict';
 
-var requireDir = require('require-dir');
 var express = require('express');
 var Server = require('socket.io');
 var io = new Server();
-require('../src/SMILA/SMILA.js');
 var requireDir = require('require-dir');
 var fmt = require('util').format;
 var util = require('util');
 
+require('../src/SMILA/SMILA.js');
+
 module.exports = function()
 {
 	var app = express();
-	var smila = new SMILA("SMILA");
+	// var smila = SMILA();
 
 	app.get('/', function(req, res)
 	{
@@ -40,7 +40,7 @@ module.exports = function()
 		res.json(data);
 	});
 
-	app.get('/job', function(req, res)
+	app.post('/job', function(req, res)
 	{
 		var data =
 		{

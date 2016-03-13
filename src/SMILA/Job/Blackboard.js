@@ -11,26 +11,10 @@
  * workflows are used for initial (bulk) import of data sources. (see SMILA
  * Importing for more details)
  */
-var phantom = require('phantom');
+var requireDir = require('require-dir');
 
-SMILA.Crawler.prototype = new Worker();
-SMILA.Crawler.prototype.constructor = Crawler;
-SMILA.Crawler = function(url)
+SMILA.Blackboard.prototype.constructor = SMILA.Blackboard;
+SMILA.Blackboard = function()
 {
-	phantom.create().then(function(ph)
-	{
-		ph.createPage().then(function(page)
-		{
-			page.open(url).then(function(status)
-			{
-				console.log(status);
-				page.property('content').then(function(content)
-				{
-					console.log(content);
-					page.close();
-					ph.exit();
-				});
-			});
-		});
-	});
+	this.models = requireDir("Model");
 };

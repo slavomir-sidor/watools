@@ -13,11 +13,10 @@
  */
 var phantom = require('phantom');
 
-SMILA.Crawler.prototype = new Worker();
-SMILA.Crawler.prototype.constructor = Crawler;
+SMILA.Crawler.prototype.constructor = SMILA.Crawler;
 SMILA.Crawler = function(url)
 {
-	phantom.create().then(function(ph)
+	this.phantom = phantom.create().then(function(ph)
 	{
 		ph.createPage().then(function(page)
 		{

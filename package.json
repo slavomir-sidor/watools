@@ -2,7 +2,7 @@
 	"name": "amazon-smila",
 	"version": "1.0.0",
 	"description": "Amazon Brands",
-	"main": "bin/smila.js",
+	"main": "bin/index.js",
 	"scripts": 
 	{
 		"lint": "eslint . && jscs .",

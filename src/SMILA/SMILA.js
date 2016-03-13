@@ -4,8 +4,4 @@
  * @author Slavomir
  */
 
-var SMILA = function(name)
-{
-	this.name = name;
-	
-};
+var SMILA = {}

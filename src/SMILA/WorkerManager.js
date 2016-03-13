@@ -4,7 +4,7 @@
  * @author Slavomir
  */
 
-SMILA.WorkerManager = function(name)
+SMILA.WorkerManager = function()
 {
-	this.name = name;
+	
 };
