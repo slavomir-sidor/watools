@@ -4,7 +4,13 @@
  * @author Slavomir
  */
 
-SMILA.Worker = function(name)
+/**
+ * Module exports.
+ */
+
+
+Worker = function()
 {
-	this.name = name;
+	
 };
+module.exports = Worker;

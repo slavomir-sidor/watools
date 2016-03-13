@@ -12,25 +12,29 @@
  * Importing for more details)
  */
 
-require('es6-promise').polyfill();
-var util = require('util');
-var phantom = require('phantom');
-
 Crawler = function()
 {
-
-	var request = require('request');
-	request.get('http://www.whatever.com/my.csv', function (error, response, body) {
-	    if (!error && response.statusCode == 200) {
-	        var csv = body;
-	        // Continue with your processing here.
-	    }
-	});
+	this.page = webpage.create();
 };
 
 Crawler.run = function()
 {
-
+	phantom.create().then(function(ph)
+	{
+		ph.createPage().then(function(page)
+		{
+			page.open('https://stackoverflow.com/').then(function(status)
+			{
+				console.log(status);
+				page.property('content').then(function(content)
+				{
+					console.log(content);
+					page.close();
+					ph.exit();
+				});
+			});
+		});
+	});
 };
 
 /**
