@@ -7,12 +7,13 @@ var requireDir = require('require-dir');
 var fmt = require('util').format;
 var util = require('util');
 
-require('../src/SMILA/SMILA.js');
+//require('../src/SMILA/SMILA.js');
+require('../src/SMILA/WorkerManager.js');
 
 module.exports = function()
 {
 	var app = express();
-	// var smila = SMILA();
+	var smila = new SMILA.WorkerManager();
 
 	app.get('/', function(req, res)
 	{
@@ -26,15 +27,6 @@ module.exports = function()
 
 	app.get('/jobs', function(req, res)
 	{
-		var data =
-		{
-			message : 'Hello, World!',
-			pid : process.pid,
-			address : req.socket.localAddress,
-			port : req.socket.localPort,
-			count : 0
-		};
-
 		console.log(util.inspect(data, false, null));
 
 		res.json(data);
