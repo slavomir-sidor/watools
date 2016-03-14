@@ -1,0 +1,30 @@
+<html>
+<head>
+<script src="/socket.io/socket.io-1.4.5.js"></script>
+</head>
+<body>
+	<h1>SMILA</h1>
+
+	<h1>Jobs</h1>
+	<ul class="workerManager.jobs">
+	</ul>
+
+	<h1>Tasks</h1>
+	<ul class="workerManager.tasks">
+	</ul>
+
+	<script>
+		var socket = io.connect('http://localhost:3005/');
+
+		socket.on('news', function(data)
+		{
+			console.log(data);
+
+			socket.emit('my other event',
+			{
+				my : 'data'
+			});
+		});
+	</script>
+</body>
+</html>

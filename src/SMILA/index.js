@@ -4,66 +4,125 @@
  * @author Slavomir
  */
 var requireDir = require('require-dir');
-var Jobs = requireDir('./Job/');
-var Pipelines = requireDir('./Pipeline/');
 var mongoose = require("mongoose");
-var Models = requireDir('./Model/');
+var fmt = require('util').format;
+var util = require('util');
+var express = require('express');
+var bodyParser = require('body-parser');
+var stringify = require('node-stringify');
+var Promise = require('promise');
+var BlackBoard = require('./BlackBoard.js');
 var WorkerManager = require('./WorkerManager.js');
 
-SMILA = function(express, io)
+require('es6-promise').polyfill();
+
+SMILA = function(name, maxThreads)
 {
 	var self = this;
 
-	this.name = "SMILA";
-	this.jobs = new Array();
-	this.express = express;
-	this.io = io;
-	this.mongoose = mongoose;
-	this.mongooseUristring = 'mongodb://localhost/' + this.name;
-	var db = mongoose.connection;
-	
-	db.on('error', console.error.bind(console, 'connection error:'));
-	db.once('open', function()
+	if (!name)
 	{
-		console.log('Succeeded connected to: ' + self.mongooseUristring);
-		console.log('Importing Models ... ');
+		name = "SMILA";
+	}
 
-		self.models = new Array();
+	if (!maxThreads)
+	{
+		maxThreads = -1;
+	}
 
-		for (modelName in Models)
-		{
-			var model = self.mongoose.model(modelName);
-			self.models[modelName] = model;
-			console.log('Importing Model: ' + modelName);
-		}
+	console.log('Running Smila ' + name);
+
+	self.name = name;
+	self.maxThreads = maxThreads;
+	self.app = express();
+
+	self.app.use(bodyParser());
+
+	self.server = require('http').Server(self.app);
+	self.io = require('socket.io')(self.server);
+	self.blackBoard = new BlackBoard(this);
+	self.workerManager = new WorkerManager(this);
+
+	self.app.use(express.static(__dirname + '/public'));
+
+	self.app.get('/jobs', function(req, res)
+	{
+		res.json(util.inspect(self.workerManager.jobs, false, null));
 	});
 
-	mongoose.connect(this.mongooseUristring);
-
-	console.log('Importing Jobs ... ');
-	for (job in Jobs)
+	self.app.get('/job', function(req, res)
 	{
-		this.jobs[job] = Jobs[job];
-		console.log('Importing Job: ' + job);
-	}
-	
-	this.pipelines = Pipelines;
-	this.workerManager = new WorkerManager();
+		var job = req.param('jobName');
+		var url = req.param('url');
 
-	io.on('connection', function(socket)
+		// res.send(util.inspect(self.workerManager.jobs['jobName'], false,
+		// null));
+	});
+
+	self.app.post('/job', function(req, res)
 	{
-		console.log('SMILA user connected');
+		var job = req.body.jobName;
+		var url = req.body.url;
+		var worker=self.runJob(job,url);
+		res.send({});
+	});
 
-		socket.on('disconnect', function()
+	self.app.get('/pipelines', function(req, res)
+	{
+		res.json(smila.pipelines);
+	});
+
+	self.app.get('/pipeline', function(req, res)
+	{
+		res.json(smila.pipelines);
+	});
+
+	self.app.get('/models', function(req, res)
+	{
+		res.json(util.inspect(smila.jobs, false, null));
+	});
+
+	self.app.get('/model', function(req, res)
+	{
+
+		res.json(smila.mongoose.connection.Schema);
+	});
+
+	self.app.get('/records', function(req, res)
+	{
+		res.send(util.inspect(res, false, null));
+	});
+
+	self.app.get('/record', function(req, res)
+	{
+		res.send(util.inspect(res, false, null));
+	});
+
+	self.app.get('/info', function(req, res)
+	{
+		var s = req.socket;
+		var msg = fmt('SMILA IS Running on %s:%d.\n', s.localAddress, s.localPort);
+		msg = msg + util.inspect(this, false, null);
+		res.send(msg);
+	});
+
+	self.io.on('connection', function(socket)
+	{
+		socket.emit('news',
 		{
-			console.log('user disconnected');
+			hello : 'world'
+		});
+
+		socket.on('my other event', function(data)
+		{
+			console.log(data);
 		});
 	});
-}
+};
 
-SMILA.runJob = function(job, url)
+SMILA.prototype.runJob = function(job, url)
 {
-
+	return this.workerManager.run(job, url);
 };
 
 module.exports = SMILA;

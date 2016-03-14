@@ -12,26 +12,26 @@
  * Importing for more details)
  */
 
-require('es6-promise').polyfill();
-var util = require('util');
 var phantom = require('phantom');
+var request = require('request');
+var stringify = require('node-stringify');
 
-Crawler = function()
+Crawler = function(url)
 {
-
-	var request = require('request');
-	request.get('http://www.whatever.com/my.csv', function (error, response, body) {
-	    if (!error && response.statusCode == 200) {
-	        var csv = body;
-	        // Continue with your processing here.
-	    }
+	this.url = url;
+	this.request = request;
+	this.request.get(url, function(error, response, body)
+	{
+		if (!error && response.statusCode == 200)
+		{
+			console.log(stringify(response));
+		}
+		else
+		{
+			console.log(error);
+		}
 	});
-};
-
-Crawler.run = function()
-{
-
-};
+}
 
 /**
  * Module exports.

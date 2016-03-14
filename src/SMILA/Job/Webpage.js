@@ -12,32 +12,44 @@
  * Importing for more details)
  */
 
-require('es6-promise').polyfill();
-var util = require('util');
 var phantom = require('phantom');
+var system = require('system');
+var process = require('process');
+var stringify = require('node-stringify');
+var Promise = require('es6-promise');
 
-Webpage = function()
+Webpage = function(url)
 {
 
-	// phantom.create();
+	var self = this;
+	this.url = url;
 
 	phantom.create().then(function(ph)
 	{
+		console.log('asdasd');
+
 		ph.createPage().then(function(page)
 		{
-			console.log(util.inspect(page, false, null));
 			// use page
 			ph.exit();
 		});
 	});
-};
 
-Crawler.run = function()
-{
+	/*
+	 * 
+	 * phantom.create(function(err, ph) { return ph.createPage(function(err,
+	 * page) { return page.open(url, function(err, status) { console.log("opened
+	 * site? ", status);
+	 * page.includeJs('http://127.0.0.1:3005/jquery-2.2.1.min.js', function(err) {
+	 * setTimeout(function() { return page.evaluate(function() { return {
+	 * asdasd: "asdasd" } ; }, function(err, result) { console.log(result);
+	 * ph.exit(); }); }, 5000); }); }); }); }, { parameters : {
+	 * 'ignore-ssl-errors' : 'yes' } });
+	 */
 
 };
 
 /**
  * Module exports.
  */
-module.exports = Crawler;
+module.exports = Webpage;
