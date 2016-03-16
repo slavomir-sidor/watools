@@ -1,57 +1,97 @@
 /**
  * Semantic Information Logistic Architecture
  * 
+ * 
+ * 
  * @author Slavomir
  */
 
 var requireDir = require('require-dir');
-var exec = require('child_process').exec;
-var process = require('process');
 var util = require('util');
-var jobs = requireDir('./Job/');
+var stringify = require('node-stringify');
 var pipelines = requireDir('./Pipeline/');
+var fs = require('fs');
+var childProcess = require('child_process');
+var exec = childProcess.exec;
+var Worker = require('./Worker.js');
 
 WorkerManager = function(smila)
 {
-	this.smila = smila;
+	var self = this;
+	self.smila = smila;
 
-	console.log('Initializing Worker Manager, on' + this.smila.maxThreads + ' max threads . ');
+	console.log('Initializing SMILA Worker Manager Socket');
+	// console.log(stringify(self.smila.io));
 
-	this.jobs = new Array();
-
-	console.log('Importing Jobs ... ');
-
-	for (jobName in jobs)
+	self.smila.io.on('connection', function(socket)
 	{
-		var job = new jobs[jobName];
+		console.log('connection');
+		socket.emit('welcome', {});
 
-		console.log('Importing Job: ' + jobName);
+		socket.on('WorkerManager.onJobEnd', function(data)
+		{
 
-		this.jobs[jobName] = job;
-	}
+		});
 
+		socket.on('WorkerManager.onJobStart', function(data)
+		{
+
+		});
+
+	});
+
+	self.jobsDir = __dirname + '/Job';
+
+	self.jobs = fs.readdir(self.jobsDir, function(error, jobs)
+	{
+		console.log('Impoted (' + jobs.length + ') SMILA Worker Manager Jobs ');
+
+		return jobs;
+	});
+
+	this.tasks = new Array();
 	this.workers = new Array();
 };
 
-WorkerManager.prototype.run = function(job, url)
+WorkerManager.prototype.run = function(jobName, url)
 {
-	var workerCommand = 'node ' + __dirname + '/Worker.js ' + job + ' ' + url;
+	var command = 'node_modules/.bin/phantomjs ' + __dirname + '/Job/' + jobName + '.js ' + url;
 
-	console.log(workerCommand);
-	// workerCommand="ls -all";
-
-	exec(workerCommand, function(error, stdout, stderr)
+	var worker = exec(
+	[
+		command
+	],
 	{
-
-		console.log('stdout: ', stdout);
-		console.log('stderr: ', stderr);
-
-		if (error !== null)
+		encoding : 'utf8',
+		timeout : 0,
+		maxBuffer : 200 * 1024,
+		killSignal : 'SIGTERM',
+		cwd : null,
+		env : null
+	}, function(error, out, code)
+	{
+		if (error instanceof Error)
 		{
-			console.log('exec error: ', error);
+			console.log(stringify(error));
 		}
 
+		console.log(stringify(error));
+		console.log(stringify(out));
+		console.log(stringify(code));
+
+		// worker.exit(code);
 	});
+
+	this.tasks.push(worker);
+
+	console.log('Worker command: ' + command);
+
+	return worker;
+};
+
+WorkerManager.prototype.next = function()
+{
+
 };
 
 /**

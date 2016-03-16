@@ -4,28 +4,19 @@
  * @author Slavomir
  */
 
-var process = require('process');
+var process = require('child_process');
+var exec = process.exec;
 var stringify = require('node-stringify');
 
-Worker = function(jobName, url)
+Worker = function(command)
 {
 
-	this.jobName = jobName;
-	this.url = url;
+	this.command = command;
 
-	var job = require('./Job/' + this.jobName + '.js');
-	this.job = new job(url);
+	
 };
 
 /**
  * Module exports.
  */
 module.exports = Worker;
-
-if (process.argv.length > 2)
-{
-	var jobName = process.argv[2];
-	var url = process.argv[3];
-
-	var worker = new Worker(jobName, url);
-}

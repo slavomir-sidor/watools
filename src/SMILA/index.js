@@ -3,6 +3,7 @@
  * 
  * @author Slavomir
  */
+
 var requireDir = require('require-dir');
 var mongoose = require("mongoose");
 var fmt = require('util').format;
@@ -14,32 +15,59 @@ var Promise = require('promise');
 var BlackBoard = require('./BlackBoard.js');
 var WorkerManager = require('./WorkerManager.js');
 
-require('es6-promise').polyfill();
-
-SMILA = function(name, maxThreads)
+SMILA = function(name, port, maxThreads)
 {
+
 	var self = this;
 
 	if (!name)
 	{
 		name = "SMILA";
 	}
+	console.log('Running Smila ' + name);
 
 	if (!maxThreads)
 	{
 		maxThreads = -1;
 	}
 
-	console.log('Running Smila ' + name);
+	self.port = 3005;
+	if (!port && 'PORT' in process.env)
+	{
+		self.port = process.env.PORT;
+	}
 
 	self.name = name;
-	self.maxThreads = maxThreads;
-	self.app = express();
 
+	self.maxThreads = maxThreads;
+
+	self.app = express();
 	self.app.use(bodyParser());
 
-	self.server = require('http').Server(self.app);
-	self.io = require('socket.io')(self.server);
+	self.server = require('http').createServer(self.app);
+
+	self.start = self.app.listen = function()
+	{
+		return self.server.listen.apply(self.server, arguments)
+	};
+
+	self.io = require('socket.io').listen(self.server);
+	self.io.on('connection', function(socket)
+	{
+		console.log('connection');
+		
+		socket.on('event', function(data)
+		{
+			console.log('event');
+			console.log(data);
+		});
+
+		socket.on('disconnect', function()
+		{
+			console.log('disconnect');
+		});
+	});
+
 	self.blackBoard = new BlackBoard(this);
 	self.workerManager = new WorkerManager(this);
 
@@ -47,77 +75,83 @@ SMILA = function(name, maxThreads)
 
 	self.app.get('/jobs', function(req, res)
 	{
-		res.json(util.inspect(self.workerManager.jobs, false, null));
+		res.json(stringify(self.workerManager));
 	});
 
 	self.app.get('/job', function(req, res)
 	{
-		var job = req.param('jobName');
+		var jobName = req.param('jobName');
 		var url = req.param('url');
 
-		// res.send(util.inspect(self.workerManager.jobs['jobName'], false,
-		// null));
+		res.json(stringify(self.workerManager.jobs[jobName]));
 	});
 
-	self.app.post('/job', function(req, res)
+	self.app.get('/tasks', function(req, res)
+	{
+		res.json(self.workerManager);
+	});
+
+	self.app.post('/task', function(req, res)
 	{
 		var job = req.body.jobName;
 		var url = req.body.url;
-		var worker=self.runJob(job,url);
-		res.send({});
+		var worker = self.runJob(job, url);
+
+		res.json({worker:worker});
+	});
+
+	self.app.post('/workers', function(req, res)
+	{
+		res.json(stringify(this.workerManager.workers));
 	});
 
 	self.app.get('/pipelines', function(req, res)
 	{
-		res.json(smila.pipelines);
+		res.json(stringify(this.workerManager.pipelines));
 	});
 
 	self.app.get('/pipeline', function(req, res)
 	{
-		res.json(smila.pipelines);
+		var pipelineName = req.param('pipelineName');
+
+		res.json(stringify(self.workerManager.pipelines[pipelineName]));
 	});
 
 	self.app.get('/models', function(req, res)
 	{
-		res.json(util.inspect(smila.jobs, false, null));
+		res.json(stringify((smila.blackBoard.db)));
 	});
 
 	self.app.get('/model', function(req, res)
 	{
-
-		res.json(smila.mongoose.connection.Schema);
+		res.json(self.blackBoard.smila.mongoose.connection.Schema);
 	});
 
 	self.app.get('/records', function(req, res)
 	{
-		res.send(util.inspect(res, false, null));
+		res.send(stringify(self.blackBoard.getRecords()));
 	});
 
 	self.app.get('/record', function(req, res)
 	{
+		var pipelineName = req.param('pipelineName');
+
 		res.send(util.inspect(res, false, null));
 	});
 
 	self.app.get('/info', function(req, res)
 	{
-		var s = req.socket;
-		var msg = fmt('SMILA IS Running on %s:%d.\n', s.localAddress, s.localPort);
-		msg = msg + util.inspect(this, false, null);
-		res.send(msg);
+		res.send(stringify(this));
 	});
 
-	self.io.on('connection', function(socket)
+	self.app.get('/ping', function(req, res)
 	{
-		socket.emit('news',
-		{
-			hello : 'world'
-		});
-
-		socket.on('my other event', function(data)
-		{
-			console.log(data);
-		});
+		req.io.route('hello');
+		// res.send(stringify(this));
 	});
+
+	console.log('Running SMILA Server' + name);
+	self.start(self.port);
 };
 
 SMILA.prototype.runJob = function(job, url)

@@ -1,0 +1,24 @@
+var page = require('webpage').create();
+
+console.log('The default user agent is ' + page.settings.userAgent);
+
+page.settings.userAgent = 'Web Tests';
+
+page.open('http://www.amazon.com', function(status) {
+
+	if (status !== 'success') {
+
+		console.log('Unable to access network');
+
+	} else {
+
+		var ua = page.evaluate(function() {
+			return document.getElementById('myagent').textContent;
+		});
+
+		console.log(ua);
+
+	}
+
+	phantom.exit();
+});

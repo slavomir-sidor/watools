@@ -1,0 +1,3 @@
+#!/bin/bash
+
+node $(pwd)/src/SMILA/server.js

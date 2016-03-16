@@ -26,8 +26,6 @@ Webpage = function(url)
 
 	phantom.create().then(function(ph)
 	{
-		console.log('asdasd');
-
 		ph.createPage().then(function(page)
 		{
 			// use page
