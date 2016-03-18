@@ -33,6 +33,7 @@ AmazonPage.prototype.getScreenshotFilename = function()
 	if (null == this.screenshotFilename)
 	{
 		var urlParse = parse(this.url);
+
 		this.screenshotFilename = this.screenshotDir + '/';
 
 		if (urlParse.host == "about:blank")

@@ -3,15 +3,15 @@ var system = require('system');
 var args = system.args;
 var stringify = require('node-stringify');
 
-Google = function(url)
+GoogleLogo = function(url)
 {
 	this.url = url;
 	this.categories = new Array();
 }
 
-Google.prototype = new Webpage();
-Google.prototype.constructor = Google;
-Google.prototype.processPage = function(callback)
+GoogleLogo.prototype = new Webpage();
+GoogleLogo.prototype.constructor = GoogleLogo;
+GoogleLogo.prototype.processPage = function(callback)
 {
 	AmazonPage.prototype.processPage.call(this, callback);
 
@@ -83,5 +83,5 @@ if (args.length > 1)
 {
 	var url = args[1];
 }
-var gp = new Google(url);
-gp.process();
+var gl = new GoogleLogo(url);
+gl.process();

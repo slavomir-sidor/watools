@@ -55,7 +55,7 @@ SMILA = function(name, port, maxThreads)
 	self.io.on('connection', function(socket)
 	{
 		console.log('connection');
-		
+
 		socket.on('event', function(data)
 		{
 			console.log('event');
@@ -75,7 +75,14 @@ SMILA = function(name, port, maxThreads)
 
 	self.app.get('/jobs', function(req, res)
 	{
-		res.json(stringify(self.workerManager));
+		var jobs = new Array();
+
+		for (job in self.workerManager.jobs)
+		{
+			jobs.push(job);
+		}
+
+		res.json(stringify(jobs));
 	});
 
 	self.app.get('/job', function(req, res)
@@ -97,7 +104,10 @@ SMILA = function(name, port, maxThreads)
 		var url = req.body.url;
 		var worker = self.runJob(job, url);
 
-		res.json({worker:worker});
+		res.json(
+		{
+			worker : worker
+		});
 	});
 
 	self.app.post('/workers', function(req, res)
