@@ -10,16 +10,7 @@ var Url = mongoose.model('Url',
 	/**
 	 * 
 	 */
-	url : String,
-
-	job : String,
-
-	content : String,
-
-	created: { type: Date, default: Date.now },
-	
-	processed: { type: Date, default: Date.now }
-
+	url : String
 });
 
 /**

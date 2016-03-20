@@ -49,14 +49,20 @@ WorkerManager = function(smila)
 		return jobs;
 	});
 
+	/**
+	 * Task Stack
+	 */
 	this.tasks = new Array();
+
+	/**
+	 * Task Workers
+	 */
 	this.workers = new Array();
 };
 
 WorkerManager.prototype.run = function(jobName, url)
 {
 	var command = 'node_modules/.bin/phantomjs ' + __dirname + '/Job/' + jobName + '.js ' + url;
-
 	var worker = exec(
 	[
 		command
@@ -81,13 +87,26 @@ WorkerManager.prototype.run = function(jobName, url)
 
 		// worker.exit(code);
 	});
-
 	this.tasks.push(worker);
+
+	if (count(this.tasks.length > 0))
+	{
+
+	}
 
 	console.log('Worker command: ' + command);
 
 	return worker;
 };
+
+WorkerManager.prototype.runWorker = function()
+{
+	if (this.maxThreads != -1 && this.worker.length > this.maxThreads)
+	{
+		return;
+	}
+
+}
 
 WorkerManager.prototype.next = function()
 {

@@ -7,8 +7,9 @@ var Record = mongoose.model('Record',
 {
 	id : String,
 
-	Model : String
+	Model : String,
 
+	Content : String
 });
 
 Record.prototype.getRecord = function(id)
@@ -20,7 +21,6 @@ Record.prototype.getRecordMetadata = function(id)
 {
 
 };
-
 
 /**
  * Module exports.

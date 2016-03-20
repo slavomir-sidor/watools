@@ -28,7 +28,7 @@ SMILA = function(name, port, maxThreads)
 
 	if (!maxThreads)
 	{
-		maxThreads = -1;
+		maxThreads = 5;
 	}
 
 	self.port = 3005;
@@ -54,35 +54,23 @@ SMILA = function(name, port, maxThreads)
 	self.io = require('socket.io').listen(self.server);
 	self.io.on('connection', function(socket)
 	{
-		console.log('connection');
-
-		socket.on('event', function(data)
-		{
-			console.log('event');
-			console.log(data);
-		});
-
-		socket.on('disconnect', function()
-		{
-			console.log('disconnect');
-		});
+		console.log('a user connected');
 	});
 
 	self.blackBoard = new BlackBoard(this);
 	self.workerManager = new WorkerManager(this);
 
 	self.app.use(express.static(__dirname + '/public'));
-
 	self.app.get('/jobs', function(req, res)
 	{
 		var jobs = new Array();
 
-		for (job in self.workerManager.jobs)
+		for (job in self.workerManager)
 		{
 			jobs.push(job);
 		}
 
-		res.json(stringify(jobs));
+		res.json(stringify(self.workerManager.jobs));
 	});
 
 	self.app.get('/job', function(req, res)
@@ -95,7 +83,7 @@ SMILA = function(name, port, maxThreads)
 
 	self.app.get('/tasks', function(req, res)
 	{
-		res.json(self.workerManager);
+		res.json(self.workerManager.tasks);
 	});
 
 	self.app.post('/task', function(req, res)
