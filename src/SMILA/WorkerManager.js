@@ -7,105 +7,63 @@
  */
 
 var requireDir = require('require-dir');
+
+var fs = require('fs');
 var util = require('util');
 var stringify = require('node-stringify');
-var pipelines = requireDir('./Pipeline/');
-var fs = require('fs');
-var childProcess = require('child_process');
-var exec = childProcess.exec;
-var Worker = require('./Worker.js');
 
 WorkerManager = function(smila)
 {
-	var self = this;
-	self.smila = smila;
+	this.smila = smila;
 
-	console.log('Initializing SMILA Worker Manager Socket');
-	// console.log(stringify(self.smila.io));
-
-	self.smila.io.on('connection', function(socket)
-	{
-		console.log('connection');
-		socket.emit('welcome', {});
-
-		socket.on('WorkerManager.onJobEnd', function(data)
-		{
-
-		});
-
-		socket.on('WorkerManager.onJobStart', function(data)
-		{
-
-		});
-
-	});
-
-	self.jobsDir = __dirname + '/Job';
-
-	self.jobs = fs.readdir(self.jobsDir, function(error, jobs)
-	{
-		console.log('Impoted (' + jobs.length + ') SMILA Worker Manager Jobs ');
-
-		return jobs;
-	});
+	console.log('Initializing SMILA Worker Manager:');
 
 	/**
-	 * Task Stack
+	 * Stack
 	 */
 	this.tasks = new Array();
 
-	/**
-	 * Task Workers
-	 */
-	this.workers = new Array();
+	this.jobs = fs.readdirSync(__dirname + '/Job', function(error, files)
+	{
+		return files;
+	});
+
+	this.workers = fs.readdirSync(__dirname + '/Worker', function(error, files)
+	{
+		return files;
+	});
+
+	this.pipelines = fs.readdirSync(__dirname + '/Pipeline', function(error, files)
+	{
+		return files;
+	});
 };
 
-WorkerManager.prototype.run = function(jobName, url)
+WorkerManager.prototype.runWorker = function(name, job, input)
 {
-	var command = 'node_modules/.bin/phantomjs ' + __dirname + '/Job/' + jobName + '.js ' + url;
-	var worker = exec(
-	[
-		command
-	],
-	{
-		encoding : 'utf8',
-		timeout : 0,
-		maxBuffer : 200 * 1024,
-		killSignal : 'SIGTERM',
-		cwd : null,
-		env : null
-	}, function(error, out, code)
-	{
-		if (error instanceof Error)
-		{
-			console.log(stringify(error));
-		}
+	var file=name+'.js';
+	
+	console.log(name);
 
-		console.log(stringify(error));
-		console.log(stringify(out));
-		console.log(stringify(code));
-
-		// worker.exit(code);
-	});
-	this.tasks.push(worker);
-
-	if (count(this.tasks.length > 0))
-	{
-
-	}
-
-	console.log('Worker command: ' + command);
+	var worker = require('./Worker/'+file)(job, input);
 
 	return worker;
-};
-
-WorkerManager.prototype.runWorker = function()
-{
-	if (this.maxThreads != -1 && this.worker.length > this.maxThreads)
+	
+	if (this.maxThreads != -1 && this.workers.length > this.maxThreads)
 	{
+		this.tasks.push(worker);
 		return;
 	}
 
+	if (this.maxThreads > this.workers.length)
+	{
+
+	}
+}
+
+WorkerManager.prototype.getJobs = function()
+{
+	return this.jobs;
 }
 
 WorkerManager.prototype.next = function()

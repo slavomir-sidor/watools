@@ -2,65 +2,75 @@
  * 
  */
 
-var mongoose = require('mongoose');
 var requireDir = require('require-dir');
-var Models = requireDir('./Model/');
 
 BlackBoard = function(smila)
 {
+	console.log('Initializing SMILA Blackboard.');
+
+	this.smila = smila;
+	this.name = this.smila.name;
+	this.uristring = 'mongodb://localhost/' + this.name;
+	this.mongoose = require('mongoose');
+
 	var self = this;
 
-	self.smila = smila;
-	self.models = new Array();
-	self.uristring = 'mongodb://localhost/' + self.smila.name;
-	self.mongoose = mongoose;
-	self.db = self.mongoose.connection;
-
-	self.db.on('error', function(console)
+	this.mongoose.connection.on('error', function()
 	{
-		self.onError(console);
+		self.onError();
 	});
 
-	self.db.once('open', function()
+	this.mongoose.connection.once('open', function()
 	{
 		self.onOpen();
-
-		console.log('Importing Models ... ');
-
-		for (modelName in Models)
-		{
-			var model = self.mongoose.model(modelName);
-
-			console.log('Importing Model: ' + modelName);
-
-			self.models[modelName] = model;
-		}
 	});
+
+	this.mongoose.connect(this.uristring);
 };
 
-BlackBoard.prototype.onError = function(console)
+BlackBoard.prototype.onError = function()
 {
-	console.error.bind(console, 'BlackBoard Connection error:');
+	console.log('BlackBoard Connection error (' + this.uristring + ')');
 };
 
-BlackBoard.prototype.onOpen = function(console)
+BlackBoard.prototype.onOpen = function()
 {
-	console.log('BlackBoard Succeeded connected to: ' + self.uristring);
+	console.log('BlackBoard Succeeded connected to: ' + this.uristring);
+
+	this.models = requireDir('./Model/');
 };
 
-BlackBoard.prototype.saveRecord = function(id)
+BlackBoard.prototype.getModels = function()
 {
-
+	return this.mongoose.modelSchemas;
 };
 
-BlackBoard.prototype.getRecord = function(id)
+BlackBoard.prototype.getModel = function(model)
 {
+	var models = this.mongoose.modelSchemas;
 
+	return models[model];
 };
 
-BlackBoard.prototype.getRecordMetadata = function(id)
+BlackBoard.prototype.getRecords = function(model)
 {
+	var model = this.mongoose.modelSchemas[model];
+	return model.find();
+};
 
+BlackBoard.prototype.putRecord = function(model, data)
+{
+	console.log(model);
+	console.log(data)
+};
+
+BlackBoard.prototype.saveRecord = function(model)
+{
+};
+
+BlackBoard.prototype.getRecord = function(model, id)
+{
+	return new this.mongoose.modelSchemas[model].find(id);
 };
 
 /**

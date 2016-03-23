@@ -17,7 +17,7 @@ Pipeline = function(name)
 
 Pipeline.prototype.run = function(webpage)
 {
-
+	
 };
 
 module.exports = Pipeline;

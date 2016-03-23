@@ -4,93 +4,88 @@
  * @author Slavomir
  */
 
-var requireDir = require('require-dir');
-var mongoose = require("mongoose");
-var fmt = require('util').format;
-var util = require('util');
 var express = require('express');
+var http = require('http');
+var io = require('socket.io');
 var bodyParser = require('body-parser');
-var stringify = require('node-stringify');
 var Promise = require('promise');
 var BlackBoard = require('./BlackBoard.js');
 var WorkerManager = require('./WorkerManager.js');
+var util = require('util');
+var fmt = util.format;
 
 SMILA = function(name, port, maxThreads)
 {
-
-	var self = this;
-
 	if (!name)
 	{
-		name = "SMILA";
+		name = "node-smila";
 	}
-	console.log('Running Smila ' + name);
-
 	if (!maxThreads)
 	{
 		maxThreads = 5;
 	}
-
-	self.port = 3005;
+	this.port = 3005;
 	if (!port && 'PORT' in process.env)
 	{
 		self.port = process.env.PORT;
 	}
+	this.name = name;
+	this.maxThreads = maxThreads;
 
-	self.name = name;
+	console.log('Starting SMILA (' + this.name + ')');
 
-	self.maxThreads = maxThreads;
+	this.app = express();
+	this.server = http.Server(this.app);
+	this.io = io(this.server);
+	this.bodyParser = bodyParser;
+	this.blackBoard = new BlackBoard(this);
+	this.workerManager = new WorkerManager(this);
+};
 
-	self.app = express();
-	self.app.use(bodyParser());
+SMILA.prototype.runWorkerJob = function(worker, job, params)
+{
+	return this.workerManager.runWorker(worker, job, params);
+};
 
-	self.server = require('http').createServer(self.app);
+SMILA.prototype.start = function()
+{
+	console.log('Starting SMILA App on ' + this.port);
 
-	self.start = self.app.listen = function()
+	var self = this;
+
+	this.app.listen(this.port);
+
+	this.app.use(express.static(__dirname + '/public'));
+
+	this.app.use(this.bodyParser.urlencoded(
 	{
-		return self.server.listen.apply(self.server, arguments)
-	};
+		extended : true
+	}));
 
-	self.io = require('socket.io').listen(self.server);
-	self.io.on('connection', function(socket)
+	this.app.use(this.bodyParser.json());
+
+	/**
+	 * Jobs
+	 */
+	this.app.get('/jobs', function(req, res)
 	{
-		console.log('a user connected');
+		res.send(self.workerManager.jobs);
 	});
 
-	self.blackBoard = new BlackBoard(this);
-	self.workerManager = new WorkerManager(this);
-
-	self.app.use(express.static(__dirname + '/public'));
-	self.app.get('/jobs', function(req, res)
+	/**
+	 * Tasks
+	 */
+	this.app.get('/tasks', function(req, res)
 	{
-		var jobs = new Array();
-
-		for (job in self.workerManager)
-		{
-			jobs.push(job);
-		}
-
-		res.json(stringify(self.workerManager.jobs));
+		res.send(self.workerManager.tasks);
 	});
 
-	self.app.get('/job', function(req, res)
+	this.app.post('/task/:worker/:job', function(req, res)
 	{
-		var jobName = req.param('jobName');
-		var url = req.param('url');
+		var worker = req.params.worker;
+		var job = req.params.job;
 
-		res.json(stringify(self.workerManager.jobs[jobName]));
-	});
-
-	self.app.get('/tasks', function(req, res)
-	{
-		res.json(self.workerManager.tasks);
-	});
-
-	self.app.post('/task', function(req, res)
-	{
-		var job = req.body.jobName;
-		var url = req.body.url;
-		var worker = self.runJob(job, url);
+		var worker = self.runWorkerJob(worker, job, req.body);
 
 		res.json(
 		{
@@ -98,63 +93,103 @@ SMILA = function(name, port, maxThreads)
 		});
 	});
 
-	self.app.post('/workers', function(req, res)
+	/**
+	 * Workers
+	 */
+	this.app.get('/workers', function(req, res)
 	{
-		res.json(stringify(this.workerManager.workers));
+		res.json(self.workerManager.workers);
 	});
 
-	self.app.get('/pipelines', function(req, res)
+	/**
+	 * Blackboard
+	 */
+	this.app.get('/blackboard', function(req, res)
 	{
-		res.json(stringify(this.workerManager.pipelines));
+		res.json(self.blackBoard);
 	});
 
-	self.app.get('/pipeline', function(req, res)
+	this.app.get('/blackboard/models', function(req, res)
 	{
-		var pipelineName = req.param('pipelineName');
-
-		res.json(stringify(self.workerManager.pipelines[pipelineName]));
+		res.json(self.blackBoard.getModels());
 	});
 
-	self.app.get('/models', function(req, res)
+	this.app.get('/blackboard/model/:model', function(req, res)
 	{
-		res.json(stringify((smila.blackBoard.db)));
+		var models = self.blackBoard.getModels();
+		res.json(models[0]);
 	});
 
-	self.app.get('/model', function(req, res)
+	this.app.get('/blackboard/record/:model', function(req, res)
 	{
-		res.json(self.blackBoard.smila.mongoose.connection.Schema);
+		res.json(self.blackBoard.getRecords(req.params.model));
 	});
 
-	self.app.get('/records', function(req, res)
+	this.app.get('/blackboard/record/:model/:id', function(req, res)
 	{
-		res.send(stringify(self.blackBoard.getRecords()));
+		res.json(self.blackBoard.getRecord(req.params.model, req.params.id));
 	});
 
-	self.app.get('/record', function(req, res)
+	this.app.post('/blackboard/record/:model', function(req, res)
 	{
-		var pipelineName = req.param('pipelineName');
+		res.json(self.blackBoard.mongoose.model[req.params.model]).find();
+	});
 
+	this.app.put('/blackboard/record/:model', function(req, res)
+	{
+		res.json(self.blackBoard.putRecord(req.params.model, req.params));
+	});
+
+	/**
+	 * Info
+	 */
+	this.app.get('/info/app', function(req, res)
+	{
+		res.json(self.app.locals);
+	});
+
+	this.app.get('/info/socket', function(req, res)
+	{
+		res.json(self.io);
+	});
+
+	this.app.get('/info/server', function(req, res)
+	{
+		res.json(self.server);
+	});
+
+	this.app.get('/pipelines', function(req, res)
+	{
+		res.json(self.workerManager.pipelines);
+	});
+
+	this.app.get('/pipeline:pipeline', function(req, res)
+	{
+		res.json(self.workerManager.pipelines[req.params.pipeline]);
+	});
+
+	this.app.get('/model', function(req, res)
+	{
+		res.json(self.blackBoard.schema);
+	});
+
+	this.app.get('/records', function(req, res)
+	{
+		res.send(self.blackBoard.getRecords());
+	});
+
+	this.app.get('/record', function(req, res)
+	{
 		res.send(util.inspect(res, false, null));
 	});
 
-	self.app.get('/info', function(req, res)
-	{
-		res.send(stringify(this));
-	});
-
-	self.app.get('/ping', function(req, res)
+	this.app.get('/ping', function(req, res)
 	{
 		req.io.route('hello');
 		// res.send(stringify(this));
 	});
 
-	console.log('Running SMILA Server' + name);
-	self.start(self.port);
-};
-
-SMILA.prototype.runJob = function(job, url)
-{
-	return this.workerManager.run(job, url);
-};
+	return this.app;
+}
 
 module.exports = SMILA;
