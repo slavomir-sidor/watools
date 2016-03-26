@@ -14,7 +14,7 @@ var spawn = require('child_process').spawn;
  * (opt) callback for child.stdout onSterr - Function - (opt) callback for
  * child.stderr
  */
-Phantom = function(job, args, restarts, restartDelay, onStdout, onSterr)
+Phantom = function(job, args)
 {
 	/**
 	 * -1: forever 0: no restarts x: restart x-times
@@ -31,11 +31,25 @@ Phantom = function(job, args, restarts, restartDelay, onStdout, onSterr)
 	 */
 	this.restartDelay;
 
+	var spawnArgs = new Array();
+
+	spawnArgs.push('src/SMILA/Job/' + job + '.js');
+
+	for ( var name in args)
+	{
+		spawnArgs.push(args[name]);
+	}
+
+	this.args = spawnArgs;
+};
+
+Phantom.prototype.runJob = function(callback)
+{
 	/**
 	 * 
 	 */
-	this.spawn = spawn(this.command);
-console.log(args);
+	this.spawn = spawn(this.command, this.args);
+
 	/**
 	 * 
 	 */
@@ -51,18 +65,14 @@ console.log(args);
 
 	this.spawn.on('close', function(code, signal)
 	{
-		console.log('child process terminated due to receipt of signal ' + signal);
+		console.log('child process terminated with code ' + code + ' due to receipt of signal ' + signal);
+		callback();
 	});
 
 	this.spawn.on('message', function(msg)
 	{
-		console.log('child process terminated due to receipt of signal ' + msg);
+		console.log('MEssage ' + msg);
 	});
-};
-
-Phantom.prototype.runJob = function(job, input)
-{
-	console.log()
 };
 
 /**

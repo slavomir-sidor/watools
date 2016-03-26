@@ -89,7 +89,7 @@ SMILA.prototype.start = function()
 
 		res.json(
 		{
-			worker : worker
+			
 		});
 	});
 

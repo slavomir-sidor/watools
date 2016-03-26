@@ -17,7 +17,7 @@ var stringify = require('node-stringify');
  */
 Phantomas = function(command, args, restarts, restartDelay, onStdout, onSterr)
 {
-	this.command = command;
+	this.command = "phantomas";
 
 	this.args = args;
 

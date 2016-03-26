@@ -1,39 +1,115 @@
+var webpage = require("webpage");
+var system = require('system');
+var args = system.args;
+
 /**
- * Crawlers: concepts and basic implementations for scalable components that
- * extract data from data sources.
+ * Web Page
  * 
- * Crawler - A crawler is a special worker in an asynchronous workflow that
- * imports data from a data source (e.g. filesystem, web or database) into
- * SMILA.
- * 
- * It iterates over the data elements and creates records for all elements that
- * will be further processed in the workflow. In general crawlers resp. crawl
- * workflows are used for initial (bulk) import of data sources. (see SMILA
- * Importing for more details)
  */
-
-var phantom = require('phantom');
-var request = require('request');
-var stringify = require('node-stringify');
-
 Crawler = function(url)
 {
 	this.url = url;
-	this.request = request;
-	this.request.get(url, function(error, response, body)
+	this.page;
+	this.currentDir;
+	this.pageViewportSize =
 	{
-		if (!error && response.statusCode == 200)
+		width : 1920,
+		height : 1200
+	};
+}
+
+Crawler.prototype.getPage = function(callback)
+{
+	if (this.page == null)
+	{
+		var self = this;
+
+		page = webpage.create();
+		page.viewportSize = this.pageViewportSize;
+
+		page.onError = function(msg, trace)
 		{
-			console.log(stringify(response));
-		}
-		else
+			self.onPageError(this, msg, trace);
+		};
+
+		page.onConsoleMessage = function(msg, lineNum, sourceId)
 		{
-			console.log(error);
-		}
+			self.onConsoleMessage(msg, lineNum, sourceId);
+		};
+
+		page.onLoadFinished = function(status)
+		{
+			self.onPageLoadFinished(status, callback);
+		};
+
+		this.page = page;
+	}
+
+	return this.page;
+}
+
+Crawler.prototype.onPageError = function(msg, trace)
+{
+	this.log(msg);
+
+	var self = this;
+
+	trace.forEach(function(item)
+	{
+		self.log('  ', item.file, ':', item.line);
 	});
 }
 
-/**
- * Module exports.
- */
-module.exports = Crawler;
+Crawler.prototype.onConsoleMessage = function(msg, lineNum, sourceId)
+{
+	this.log(msg);
+}
+
+Crawler.prototype.log = function(msg)
+{
+	console.log(msg);
+	// this.logExtented(msg);
+}
+
+Crawler.prototype.logExtented = function(msg)
+{
+	console.log(util.inspect(msg, false, null));
+}
+
+Crawler.prototype.finish = function(status)
+{
+	this.log('Finish: ' + status);
+	phantom.exit(1);
+}
+
+Crawler.prototype.process = function(callback)
+{
+	this.log('Opening page: ' + this.url);
+
+	this.getPage(callback).open(this.url);
+}
+
+Crawler.prototype.onPageLoadFinished = function(status, callback)
+{
+	this.log('Page load finished: ' + status);
+
+	if (status === "success")
+	{
+		var self = this;
+
+		this.getPage(callback).includeJs("//code.jquery.com/jquery-1.12.0.min.js", function()
+		{
+
+			self.processPage(function()
+			{
+				console.log('Prcess Page callback');
+			});
+			self.finish(status);
+		});
+	}
+}
+
+Crawler.prototype.process = function(callback)
+{
+	this.log('Processing Page ...');
+}

@@ -5,18 +5,34 @@
  * 
  * @author Slavomir
  */
+/**
+ * Crawlers: concepts and basic implementations for scalable components that
+ * extract data from data sources.
+ * 
+ * Crawler - A crawler is a special worker in an asynchronous workflow that
+ * imports data from a data source (e.g. filesystem, web or database) into
+ * SMILA.
+ * 
+ * It iterates over the data elements and creates records for all elements that
+ * will be further processed in the workflow. In general crawlers resp. crawl
+ * workflows are used for initial (bulk) import of data sources. (see SMILA
+ * Importing for more details)
+ */
 
 var requireDir = require('require-dir');
 
 var fs = require('fs');
 var util = require('util');
 var stringify = require('node-stringify');
+var workers = requireDir('./Worker');
 
 WorkerManager = function(smila)
 {
+	console.log('Initializing SMILA Worker Manager:');
+
 	this.smila = smila;
 
-	console.log('Initializing SMILA Worker Manager:');
+	this.maxThreads = 5;
 
 	/**
 	 * Stack
@@ -28,37 +44,54 @@ WorkerManager = function(smila)
 		return files;
 	});
 
-	this.workers = fs.readdirSync(__dirname + '/Worker', function(error, files)
-	{
-		return files;
-	});
+	this.workers = workers;
 
 	this.pipelines = fs.readdirSync(__dirname + '/Pipeline', function(error, files)
 	{
 		return files;
 	});
+
+	this.processes = new Array();
 };
 
 WorkerManager.prototype.runWorker = function(name, job, input)
 {
-	var file=name+'.js';
-	
-	console.log(name);
-
-	var worker = require('./Worker/'+file)(job, input);
+	var worker=new this.workers[name](job, input);
+	this.tasks.push(worker);
+	this.runProcess();
 
 	return worker;
-	
-	if (this.maxThreads != -1 && this.workers.length > this.maxThreads)
+}
+
+WorkerManager.prototype.runProcess = function()
+{
+	if (this.maxThreads != -1 && this.processes.length > this.maxThreads)
 	{
-		this.tasks.push(worker);
 		return;
 	}
 
-	if (this.maxThreads > this.workers.length)
+	if (this.tasks.length > 0)
 	{
+		var self = this;
 
+		while (this.processes.length < this.maxThreads && this.tasks.length>0)
+		{
+			var process = this.tasks.shift();
+			var index = this.processes.push(process);
+
+			process.runJob(function()
+			{
+				self.onProcessFinish(index);
+			});
+		}
 	}
+}
+
+WorkerManager.prototype.onProcessFinish = function(index)
+{
+	this.processes.splice(index, 1);
+	this.runProcess();
+	console.log(index);
 }
 
 WorkerManager.prototype.getJobs = function()

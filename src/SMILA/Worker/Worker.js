@@ -15,7 +15,7 @@ var stringify = require('node-stringify');
  * (opt) callback for child.stdout onSterr - Function - (opt) callback for
  * child.stderr
  */
-Worker = function(command, args, restarts, restartDelay, onStdout, onSterr)
+Worker = function(command, args, restarts)
 {
 	this.command = command;
 
@@ -30,16 +30,6 @@ Worker = function(command, args, restarts, restartDelay, onStdout, onSterr)
 	 * restartDelay - Decimal - (opt) Delay between restarts
 	 */
 	this.restartDelay;
-
-	this.process = Spawn(
-	{
-		cmd : this.command,
-		args : this.args,
-		restarts : this.restarts,
-		restartDelay : this.restartDelay,
-		onStdout : this.onStdout,
-		onSterr : this.onSterr
-	});
 };
 
 Worker.prototype.start = function()
