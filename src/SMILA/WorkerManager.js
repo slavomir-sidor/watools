@@ -91,7 +91,6 @@ WorkerManager.prototype.onProcessFinish = function(index)
 {
 	this.processes.splice(index, 1);
 	this.runProcess();
-	console.log(index);
 }
 
 WorkerManager.prototype.getJobs = function()

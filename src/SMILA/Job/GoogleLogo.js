@@ -1,7 +1,6 @@
-var q = require('./Webpage.js');
+var web = require('./Webpage.js');
 var system = require('system');
 var args = system.args;
-var stringify = require('node-stringify');
 
 GoogleLogo = function(brand)
 {
@@ -19,11 +18,12 @@ GoogleLogo.prototype = new Webpage();
 GoogleLogo.prototype.constructor = GoogleLogo;
 GoogleLogo.prototype.processPage = function(callback)
 {
-	console.log('asdasd');
-//	Webpage.prototype.processPage.call(this, callback);
+	Webpage.prototype.processPage.call(this, callback);
+	
 	var self = this;
 	var image = this.page.evaluate(function(self)
 	{
+		console.log($('html').text());
 		return $('img').eq(1).attr('src');
 	});
 }
