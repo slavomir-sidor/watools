@@ -23,9 +23,9 @@ GoogleLogo.prototype.processPage = function(callback)
 	var self = this;
 	var image = this.page.evaluate(function(self)
 	{
-		console.log($('html').text());
 		return $('img').eq(1).attr('src');
 	});
+	console.log(image);
 }
 
 var brandName = "";

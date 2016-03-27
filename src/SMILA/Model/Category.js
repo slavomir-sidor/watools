@@ -6,22 +6,43 @@ var Schema = require('mongoose').Schema;
 
 var Category = mongoose.model('Category',
 {
-	Name : { type: String},
-	
-	Parent: {type: Schema.Types.ObjectId, ref: 'Category'},
-	
-	PageMetaTitle: { type: String},
-	
-	PageH1:{ type: String},
+	Name :
+	{
+		type : String
+	},
 
-	Created: { type: Date, default: Date.now },
-	
-	Processed: { type: Date, default: Date.now },
+	Parent :
+	{
+		type : Schema.Types.ObjectId,
+		ref : 'Category'
+	},
 
-	ProductCount: { type: Number, default: 0 }
-	
+	PageMetaTitle :
+	{
+		type : String
+	},
+
+	PageH1 :
+	{
+		type : String
+	},
+
+	Url :
+	{
+		type : String
+	},
+
+	AmazonCode :
+	{
+		type : String
+	},
+
+	ProductCount :
+	{
+		type : Number
+	}
+
 });
-
 
 /**
  * Module exports.

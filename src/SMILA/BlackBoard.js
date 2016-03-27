@@ -54,23 +54,22 @@ BlackBoard.prototype.getModel = function(model)
 
 BlackBoard.prototype.getRecords = function(model)
 {
-	var model = this.mongoose.modelSchemas[model];
-	return model.find();
+	var entity = this.mongoose.model(model);
+	//var model = this.mongoose.modelSchemas[model];
+	var count=entity.count();
+	return count;
 };
 
-BlackBoard.prototype.putRecord = function(model, data)
+BlackBoard.prototype.saveRecord = function(model, data)
 {
-	console.log(model);
-	console.log(data)
+	var entity = this.mongoose.model(model);
+	var item=new entity(data);
+	item.save();
 };
 
-BlackBoard.prototype.saveRecord = function(model)
+BlackBoard.prototype.getRecord = function(model, data)
 {
-};
-
-BlackBoard.prototype.getRecord = function(model, id)
-{
-	return new this.mongoose.modelSchemas[model].find(id);
+	return this.mongoose.model(model).find(data);
 };
 
 /**

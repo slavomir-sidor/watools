@@ -64,6 +64,13 @@ SMILA.prototype.start = function()
 
 	this.app.use(this.bodyParser.json());
 
+	this.app.all('/*', function(req, res, next)
+	{
+		res.header("Access-Control-Allow-Origin", "*");
+		res.header("Access-Control-Allow-Headers", "X-Requested-With");
+		next();
+	});
+
 	/**
 	 * Jobs
 	 */
@@ -87,9 +94,8 @@ SMILA.prototype.start = function()
 
 		var worker = self.runWorkerJob(worker, job, req.body);
 
-		res.json(
-		{
-			
+		res.json({
+
 		});
 	});
 
@@ -116,18 +122,26 @@ SMILA.prototype.start = function()
 
 	this.app.get('/blackboard/model/:model', function(req, res)
 	{
-		var models = self.blackBoard.getModels();
-		res.json(models[0]);
+		var results=res.json(self.blackBoard.getModel(req.params.model));
+		return results;
 	});
 
 	this.app.get('/blackboard/record/:model', function(req, res)
 	{
-		res.json(self.blackBoard.getRecords(req.params.model));
+		var records=self.blackBoard.getRecords(req.params.model);
+		console.log(records);
+		res.json();
+	});
+
+	this.app.post('/blackboard/record/:model', function(req, res)
+	{
+		self.blackBoard.saveRecord(req.params.model,req.body );
+		res.json();
 	});
 
 	this.app.get('/blackboard/record/:model/:id', function(req, res)
 	{
-		res.json(self.blackBoard.getRecord(req.params.model, req.params.id));
+		res.json(self.blackBoard.getRecord(req.params.model, req.params));
 	});
 
 	this.app.post('/blackboard/record/:model', function(req, res)

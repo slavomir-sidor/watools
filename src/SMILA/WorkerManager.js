@@ -46,11 +46,6 @@ WorkerManager = function(smila)
 
 	this.workers = workers;
 
-	this.pipelines = fs.readdirSync(__dirname + '/Pipeline', function(error, files)
-	{
-		return files;
-	});
-
 	this.processes = new Array();
 };
 

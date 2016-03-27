@@ -1,22 +1,23 @@
+var web = require('./Webpage.js');
 var system = require('system');
 var args = system.args;
-var AmazonPage=require('./AmazonPage.js');
+var parse = require('url-parse');
+var stringify = require('node-stringify');
 
 AmazonCategoriesPage = function()
 {
-	console.log('Amazon Categories Page.');
 	this.url = "http://www.amazon.com/gp/site-directory/ref=nav_shopall_btn";
 	this.categories = new Array();
 }
-AmazonCategoriesPage.prototype = new AmazonPage();
+
+AmazonCategoriesPage.prototype = new Webpage();
 AmazonCategoriesPage.prototype.constructor = AmazonCategoriesPage;
 AmazonCategoriesPage.prototype.processPage = function(callback)
 {
-	AmazonPage.prototype.processPage.call(this, callback);
+	Webpage.prototype.processPage.call(this, callback);
 
-	this.log('Processing Categories Page ...');
 	var self = this;
-
+	
 	var categories = this.getPage().evaluate(function()
 	{
 		var groups = $(".fsdDeptBox");
@@ -41,9 +42,8 @@ AmazonCategoriesPage.prototype.processPage = function(callback)
 					index : indexSub,
 					parent : category.name,
 					name : $(item).text(),
-					href : 'http://www.amazon.com' + $(item).attr('href'),
-					node : null,
-					url : null
+					url : 'http://www.amazon.com' + $(item).attr('href'),
+					node : null
 				};
 
 				if (c.name !== "")
@@ -57,8 +57,6 @@ AmazonCategoriesPage.prototype.processPage = function(callback)
 		return main;
 	});
 
-	this.getPage().close();
-
 	for ( var i in categories)
 	{
 		var category = categories[i];
@@ -70,12 +68,10 @@ AmazonCategoriesPage.prototype.processPage = function(callback)
 		}
 
 		category.node = urlParsed.query.node;
-		category = new AmazonCategoryPage(category);
-
 		this.categories.push(category);
 	}
-
-	console.log('categories');
+	console.log(stringify(this.categories));
+	return this.categories;
 }
 
 var url = "http://www.amazon.com/gp/site-directory/ref=nav_shopall_btn";
