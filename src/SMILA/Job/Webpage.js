@@ -6,6 +6,8 @@ Webpage = function(url)
 {
 	this.url = url;
 	this.page;
+	this.processed = false;
+
 	this.pageViewportSize =
 	{
 		width : 1920,
@@ -61,7 +63,7 @@ Webpage.prototype.onConsoleMessage = function(msg, lineNum, sourceId)
 Webpage.prototype.log = function(msg)
 {
 	console.log(msg);
-	// this.logExtented(msg);
+	//this.logExtented(msg);
 }
 
 Webpage.prototype.logExtented = function(msg)
@@ -87,14 +89,18 @@ Webpage.prototype.onPageLoadFinished = function(status, callback)
 	if (status === "success")
 	{
 		var self = this;
-		this.getPage(callback).includeJs("//code.jquery.com/jquery-1.12.0.min.js", function()
+		if (this.processed == false)
 		{
-			self.processPage(function()
+			this.getPage(callback).includeJs("//code.jquery.com/jquery-1.12.0.min.js", function()
 			{
+				self.processed = true;
 
+				self.processPage(function()
+				{
+					self.finish(status);
+				});
 			});
-			self.finish(status);
-		});
+		}
 	}
 	else
 	{
@@ -108,12 +114,9 @@ Webpage.prototype.processPage = function()
 }
 
 /*
-var url = "http://localhost";
-
-if (args.length > 1)
-{
-	var url = args[1];
-}
-
-var acp = new Webpage(url);
-acp.process();*/
+ * var url = "http://localhost";
+ * 
+ * if (args.length > 1) { var url = args[1]; }
+ * 
+ * var acp = new Webpage(url); acp.process();
+ */

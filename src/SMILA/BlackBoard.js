@@ -4,12 +4,11 @@
 
 var requireDir = require('require-dir');
 
-BlackBoard = function(smila)
+BlackBoard = function(name)
 {
 	console.log('Initializing SMILA Blackboard.');
 
-	this.smila = smila;
-	this.name = this.smila.name;
+	this.name = name;
 	this.uristring = 'mongodb://localhost/' + this.name;
 	this.mongoose = require('mongoose');
 
@@ -52,24 +51,32 @@ BlackBoard.prototype.getModel = function(model)
 	return models[model];
 };
 
-BlackBoard.prototype.getRecords = function(model)
+BlackBoard.prototype.getRecords = function(model, data, callback)
 {
 	var entity = this.mongoose.model(model);
-	//var model = this.mongoose.modelSchemas[model];
-	var count=entity.count();
-	return count;
+	entity.find(data, callback);
 };
 
-BlackBoard.prototype.saveRecord = function(model, data)
+BlackBoard.prototype.saveRecord = function(model, query, data, callback)
 {
 	var entity = this.mongoose.model(model);
-	var item=new entity(data);
-	item.save();
+	entity.findOneAndUpdate(query, data,
+	{
+		new:true,
+		upsert : true
+	}, function(err, doc)
+	{
+		console.log(err);
+		console.log(doc);
+		callback(err, doc);
+	});
 };
 
-BlackBoard.prototype.getRecord = function(model, data)
+BlackBoard.prototype.deleteRecords = function(model, data, callback)
 {
-	return this.mongoose.model(model).find(data);
+	console.log(data);
+	var entity = this.mongoose.model(model);
+	entity.find(data).remove();
 };
 
 /**

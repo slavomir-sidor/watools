@@ -38,7 +38,7 @@ SMILA = function(name, port, maxThreads)
 	this.server = http.Server(this.app);
 	this.io = io(this.server);
 	this.bodyParser = bodyParser;
-	this.blackBoard = new BlackBoard(this);
+	this.blackBoard = new BlackBoard(this.name);
 	this.workerManager = new WorkerManager(this);
 };
 
@@ -122,36 +122,38 @@ SMILA.prototype.start = function()
 
 	this.app.get('/blackboard/model/:model', function(req, res)
 	{
-		var results=res.json(self.blackBoard.getModel(req.params.model));
+		var results = res.json(self.blackBoard.getModel(req.params.model));
 		return results;
 	});
 
+	/**
+	 * Blackboard Records
+	 */
 	this.app.get('/blackboard/record/:model', function(req, res)
 	{
-		var records=self.blackBoard.getRecords(req.params.model);
-		console.log(records);
-		res.json();
+		self.blackBoard.getRecords(req.params.model, req.body, function(err, records)
+		{
+			res.json(records);
+		});
 	});
 
 	this.app.post('/blackboard/record/:model', function(req, res)
 	{
-		self.blackBoard.saveRecord(req.params.model,req.body );
+		self.blackBoard.saveRecord(
+				req.params.model,
+				req.body.query,
+				req.body.data,
+				function(error, doc)
+				{
+					res.json(doc);
+				}
+		);
+	});
+
+	this.app.delete('/blackboard/record/:model', function(req, res)
+	{
+		self.blackBoard.deleteRecords(req.params.model, req.body);
 		res.json();
-	});
-
-	this.app.get('/blackboard/record/:model/:id', function(req, res)
-	{
-		res.json(self.blackBoard.getRecord(req.params.model, req.params));
-	});
-
-	this.app.post('/blackboard/record/:model', function(req, res)
-	{
-		res.json(self.blackBoard.mongoose.model[req.params.model]).find();
-	});
-
-	this.app.put('/blackboard/record/:model', function(req, res)
-	{
-		res.json(self.blackBoard.putRecord(req.params.model, req.params));
 	});
 
 	/**

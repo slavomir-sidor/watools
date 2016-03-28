@@ -1,6 +1,5 @@
 <html>
 	<head>
-		<script src="/socket.io/socket.io-1.4.5.js"></script>
 		<script src="http://127.0.0.1:3005/jquery-2.2.1.min.js"></script>
 	</head>
 	<body>
@@ -36,17 +35,34 @@
 			</li>
 		</ul>
 
-		<script>
-			var socket = io.connect('http://localhost:3005/');
-			socket.on('news',
-			function(data)
-			{
-			console.log(data);
-
-			socket.emit('my other event',
-			{
-			my : 'data'
-			});
+		<script type="text/javascript">
+			$(document).bind('ready',function(){
+				var settings =
+				{
+					type : "POST",
+					data : {
+						query:{
+							Name:'My Category'
+						},
+						data:{
+							Name:'My Category',
+							Url:'aaaa',
+							AmazonCode:'a adsasd',
+						}
+					},
+					url : 'http://127.0.0.1:3005/blackboard/record/Category',
+					async : false,
+					success : function(data)
+					{
+						console.log(data);
+					},
+					error : function(data)
+					{
+						console.log(data);
+					}
+				};
+	
+				$.ajax(settings);
 			});
 		</script>
 

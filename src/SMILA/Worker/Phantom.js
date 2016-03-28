@@ -55,17 +55,17 @@ Phantom.prototype.runJob = function(callback)
 	 */
 	this.spawn.stdout.on('data', function(data)
 	{
-		console.log('DATA: ' + data);
+		console.log(''+data);
 	});
 
 	this.spawn.stderr.on('data', function(data)
 	{
-		console.log('DATA: ' + data);
+		console.log(''+data);
 	});
 
 	this.spawn.on('close', function(code, signal)
 	{
-		console.log('child process terminated with code ' + code + ' due to receipt of signal ' + signal);
+		console.log('child process terminated with code ' + code);
 		callback();
 	});
 
