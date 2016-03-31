@@ -51,7 +51,7 @@ WorkerManager = function(smila)
 
 WorkerManager.prototype.runWorker = function(name, job, input)
 {
-	var worker=new this.workers[name](job, input);
+	var worker = new this.workers[name](job, input);
 	this.tasks.push(worker);
 	this.runProcess();
 
@@ -69,7 +69,7 @@ WorkerManager.prototype.runProcess = function()
 	{
 		var self = this;
 
-		while (this.processes.length < this.maxThreads && this.tasks.length>0)
+		while (this.processes.length < this.maxThreads && this.tasks.length > 0)
 		{
 			var process = this.tasks.shift();
 			var index = this.processes.push(process);
@@ -92,11 +92,6 @@ WorkerManager.prototype.getJobs = function()
 {
 	return this.jobs;
 }
-
-WorkerManager.prototype.next = function()
-{
-
-};
 
 /**
  * Module exports.

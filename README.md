@@ -16,3 +16,8 @@ Instalation
 
 API
 ---
+
+    BlackBoard
+   	 
+    Jobs
+    Tasks 

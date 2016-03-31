@@ -1,5 +1,5 @@
 /**
- * Amazon Category Brands Page
+ * Amazon Brand Products Page
  * 
  */
 var web = require('./Webpage.js');
@@ -9,7 +9,7 @@ var parse = require('url-parse');
 var util = require('util');
 var stringify = require('node-stringify');
 
-function AmazonCategoryBrandsPage(amazonCode, letter, categoryId)
+function AmazonBrandProductsPage(amazonCode, letter, categoryId)
 {
 	console.log('Amazon Category Brands Page.');
 	this.categoryId = categoryId;
@@ -17,9 +17,9 @@ function AmazonCategoryBrandsPage(amazonCode, letter, categoryId)
 			+ "&indexField=" + letter;
 }
 
-AmazonCategoryBrandsPage.prototype = new Webpage();
-AmazonCategoryBrandsPage.prototype.constructor = AmazonCategoryBrandsPage;
-AmazonCategoryBrandsPage.prototype.processPage = function(callback)
+AmazonBrandProductsPage.prototype = new Webpage();
+AmazonBrandProductsPage.prototype.constructor = AmazonBrandProductsPage;
+AmazonBrandProductsPage.prototype.processPage = function(callback)
 {
 	Webpage.prototype.processPage.call(this, callback);
 
@@ -33,29 +33,26 @@ AmazonCategoryBrandsPage.prototype.processPage = function(callback)
 		$.each(brandsElements, function(index, brandElement)
 		{
 
-			var element = $(brandElement);
-			var text = element.text();
-			var productCountRegExp = new RegExp("\([0-9]+\)", "g");
-			var productCount = productCountRegExp.exec(text);
-			var url = 'http://www.amazon.com/' + element.attr('href');
-			
-			console.log(productCount);
+			var brandElement = $(brandElement);
+			var brandText = $(brandElement).text();
+			var productCountRegExp = new RegExp("\([0-9]+\)");
+			var productCount = productCountRe.exec(brandText);
+			var brandUrl = 'http://www.amazon.com/' + brandElement.attr('href');
 
-			var brand={
-					Name : text,
-					Categories : new Array(),
-					Url : url,
-					ProductCount : 0
-				};
-
-			var index = brands.push(brand);
+			var index = brands.push(
+			{
+				Name : brandText,
+				Categories : new Array(),
+				Url : brandUrl,
+				ProductCount : 0
+			});
 
 		});
 
 		console.log('Found ' + brands.length + ' brands.');
 		return;
 		var i = 0;
-		var postBrand = function()
+		var processBrand = function()
 		{
 			if (i >= brands.length)
 			{
@@ -87,13 +84,13 @@ AmazonCategoryBrandsPage.prototype.processPage = function(callback)
 					console.log('Brand.API done ' + data._id);
 					brands[i] = brand;
 					i++;
-					postBrand();
+					processBrand();
 				},
 
 				error : function(data)
 				{
 					i++;
-					postBrand();
+					processBrand();
 				}
 			};
 
@@ -101,7 +98,7 @@ AmazonCategoryBrandsPage.prototype.processPage = function(callback)
 
 		};
 
-		postBrand();
+		processBrand();
 	});
 
 	console.log('done');

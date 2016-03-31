@@ -3,6 +3,7 @@
  */
 
 var requireDir = require('require-dir');
+var stringify = require('node-stringify');
 
 BlackBoard = function(name)
 {
@@ -67,7 +68,7 @@ BlackBoard.prototype.saveRecord = function(model, query, data, callback)
 	}, function(err, doc)
 	{
 		console.log(err);
-		console.log(doc);
+		console.log(stringify(doc));
 		callback(err, doc);
 	});
 };

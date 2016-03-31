@@ -44,6 +44,7 @@ SMILA = function(name, port, maxThreads)
 
 SMILA.prototype.runWorkerJob = function(worker, job, params)
 {
+	console.log(params);
 	return this.workerManager.runWorker(worker, job, params);
 };
 
@@ -56,6 +57,9 @@ SMILA.prototype.start = function()
 	this.app.listen(this.port);
 
 	this.app.use(express.static(__dirname + '/public'));
+
+	this.app.use( bodyParser.json() );
+	//this.app.use( express.multipart());
 
 	this.app.use(this.bodyParser.urlencoded(
 	{
@@ -91,11 +95,11 @@ SMILA.prototype.start = function()
 	{
 		var worker = req.params.worker;
 		var job = req.params.job;
-
 		var worker = self.runWorkerJob(worker, job, req.body);
 
 		res.json({
-
+			command:worker.command,
+			args:worker.args
 		});
 	});
 

@@ -34,6 +34,8 @@ Worker = function(command, args, restarts)
 
 Worker.prototype.start = function()
 {
+	console.log('Runnig process: ' + this.command);
+	console.log('Runnig process args: ' + stringify(this.args));
 	this.spawn.start();
 };
 

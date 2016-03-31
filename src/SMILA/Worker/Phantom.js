@@ -6,6 +6,7 @@
 
 var process = require('child_process');
 var spawn = require('child_process').spawn;
+var stringify = require('node-stringify');
 
 /**
  * cmd : this.command, args : this.args, restarts - Integer - (opt) After death,
@@ -45,6 +46,9 @@ Phantom = function(job, args)
 
 Phantom.prototype.runJob = function(callback)
 {
+	console.log('Runnig process: ' + this.command);
+	console.log('Runnig process args: ' + stringify(this.args));
+	
 	/**
 	 * 
 	 */

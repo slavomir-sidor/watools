@@ -19,121 +19,174 @@ AmazonCategoriesPage.prototype.processPage = function(callback)
 
 	var self = this;
 
-	var categories = this.getPage().evaluate(function()
-	{
-		var groups = $(".fsdDeptBox");
-		var main = new Array();
-
-		$.each(groups, function(index, value)
-		{
-			var top = $('.fsdDeptTitle', $(value));
-
-			var category =
+	var categories = this.getPage().evaluate(
+			function()
 			{
-				Name : top.text(),
-				AmazonCode : null,
-				Url : null
-			};
+				var groups = $(".fsdDeptBox");
+				var main = new Array();
+				var alphabet = new Array('#', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
+						'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z');
 
-			var index = main.push(category);
-
-			var subs = $('.fsdDeptCol a.fsdDeptLink', $(value));
-			
-			var parentIndex = index - 1;
-
-			$.each(subs, function(indexSub, item)
-			{
-				var item = $(item);
-
-				var c =
+				$.each(groups, function(index, value)
 				{
-					Name : item.text(),
-					Parent : parentIndex,
-					Url : 'http://www.amazon.com' + item.attr('href'),
-					AmazonCode : null
+					var top = $('.fsdDeptTitle', $(value));
+
+					var category =
+					{
+						Name : top.text(),
+						AmazonCode : null,
+						Url : null
+					};
+
+					var index = main.push(category);
+
+					var subs = $('.fsdDeptCol a.fsdDeptLink', $(value));
+
+					var parentIndex = index - 1;
+
+					$.each(subs, function(indexSub, item)
+					{
+						var item = $(item);
+
+						var c =
+						{
+							Name : item.text(),
+							Parent : parentIndex,
+							Url : 'http://www.amazon.com' + item.attr('href'),
+							AmazonCode : null
+						};
+
+						if (c.Name !== "")
+						{
+							main.push(c);
+						}
+					});
+				});
+
+				console.log('Found ' + main.length + ' categories.');
+
+				var i = 0;
+
+				var runCategoryBrandsTaks = function(category, letter)
+				{
+					var brandsSettings =
+					{
+						type : "POST",
+
+						data :
+						{
+							_id : category._id,
+							AmazonCode : category.AmazonCode,
+							letter : letter
+						},
+
+						url : 'http://127.0.0.1:3005/task/Phantom/AmazonCategoryBrandsPage',
+
+						async : false,
+
+						success : function(data)
+						{
+							console.log('AmazonCategoryBrandsPage.API worker: ' + data.command);
+							console.log('AmazonCategoryBrandsPage.API worker args:  ' + data.args);
+
+							console.log('AmazonCategoryBrandsPage.API done.');
+						},
+
+						error : function(data)
+						{
+							console.log('AmazonCategoryBrandsPage.API CALL error' + data);
+						}
+					};
+
+					console.log('AmazonCategoryBrandsPage.API CALL');
+
+					var ajax = $.ajax(brandsSettings);
+
+					console.log(ajax);
 				};
 
-				if (c.Name !== "")
+				var processCategory = function()
 				{
-					main.push(c);
-				}
-			});
-		});
-
-		console.log('Found ' + main.length + ' categories.');
-
-		var i = 0;
-
-		var processCategory = function()
-		{
-			if (i >= main.length)
-			{
-				return;
-			}
-
-			var category = main[i];
-
-			console.log('Category [i] : ' + i);
-			console.log('Category.Name : ' + category.Name);
-
-			if (category.Url)
-			{
-				category.AmazonCode = category.Url.split('&').reduce(function(s, c)
-				{
-					var t = c.split('=');
-					s[t[0]] = t[1];
-					return s;
-				}, {}).node;
-			}
-			console.log('Category.Url : ' + category.Url);
-			console.log('Category.AmazonCode : ' + category.AmazonCode);
-			console.log('Category.Parent : ' + category.Parent);
-			
-			if (category.Parent)
-			{
-				parentI = parseInt(category.Parent);
-				var parentCategory=main[parentI];
-				category.Parent = parentCategory._id;
-				console.log('Category.Parent._id : ' + parentCategory._id);
-			}
-			
-			console.log('Category.API call');
-			
-			var settings =
-			{
-				type : "POST",
-				data :
-				{
-					query :
+					if (i >= main.length)
 					{
-						Name : category.Name
-					},
-					data : category
-				},
-				url : 'http://127.0.0.1:3005/blackboard/record/Category',
-				async : false,
-				success : function(data)
-				{
-					console.log('Category.API done '+data._id);
-					main[i] = data;
-					i++;
-					processCategory();
-				},
+						return;
+					}
 
-				error : function(data)
-				{
-					i++;
-					processCategory();
-				}
-			};
+					var category = main[i];
 
-			$.ajax(settings);
-		};
+					console.log('Category [i] : ' + i);
+					console.log('Category.Name : ' + category.Name);
 
-		processCategory();
+					if (category.Url)
+					{
+						category.AmazonCode = category.Url.split('&').reduce(function(s, c)
+						{
+							var t = c.split('=');
+							s[t[0]] = t[1];
+							return s;
+						}, {}).node;
+					}
+					console.log('Category.Url : ' + category.Url);
+					console.log('Category.AmazonCode : ' + category.AmazonCode);
 
-		return main;
-	});
+					if (category.Parent)
+					{
+						parentI = parseInt(category.Parent);
+						var parentCategory = main[parentI];
+						category.Parent = parentCategory._id;
+
+						console.log('Category.Parent._id : ' + parentCategory._id);
+					}
+
+					console.log('Category.API call');
+
+					var settings =
+					{
+						type : "POST",
+						data :
+						{
+							query :
+							{
+								Name : category.Name
+							},
+							data : category
+						},
+						url : 'http://127.0.0.1:3005/blackboard/record/Category',
+						async : false,
+						success : function(data)
+						{
+							console.log('Category.API done ' + data._id);
+							main[i] = data;
+
+							if (data.AmazonCode)
+							{
+								for ( var letterIndex in alphabet)
+								{
+									var letter = alphabet[letterIndex];
+									runCategoryBrandsTaks(data, letter);
+								}
+							}
+
+							i++;
+
+							processCategory();
+						},
+
+						error : function(data)
+						{
+							i++;
+							processCategory();
+						}
+					};
+
+					$.ajax(settings);
+
+				};
+
+				processCategory();
+
+				return main;
+			});
 	callback();
 	this.log('Amazon categories done.');
 }
