@@ -1,3 +1,4 @@
-var url="http://www.amazon.com/b?ie=UTF8&node=256346011";
+var url="A & R Allied Enterprise, Inc. (1)";
 
-console.log(url.split('&').reduce(function(s,c){var t=c.split('=');s[t[0]]=t[1];return s;},{}).node);
+var productCountRegExp = new RegExp("[0-9]+");
+var productCount = productCountRegExp.exec(url);

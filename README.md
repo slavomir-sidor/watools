@@ -21,3 +21,8 @@ API
    	 
     Jobs
     Tasks 
+    Workers:
+    	
+    	Example Worker command:
+    	{command} {job} {AmazonCategoryCode} {Letter} {Category._id}
+    	./node_modules/.bin/phantomjs src/SMILA/Job/AmazonCategoryBrandsPage.js 11051400011 C 56fd5dea7988a8c43e590b

@@ -37,32 +37,13 @@
 
 		<script type="text/javascript">
 			$(document).bind('ready',function(){
-				var settings =
-				{
-					type : "POST",
-					data : {
-						query:{
-							Name:'My Category'
-						},
-						data:{
-							Name:'My Category',
-							Url:'aaaa',
-							AmazonCode:'a adsasd',
-						}
-					},
-					url : 'http://127.0.0.1:3005/blackboard/record/Category',
-					async : false,
-					success : function(data)
-					{
-						console.log(data);
-					},
-					error : function(data)
-					{
-						console.log(data);
-					}
-				};
-	
-				$.ajax(settings);
+				var url="A & R Allied Enterprise, Inc. (1)";
+				var productCountRegExp = new RegExp("[0-9]+","g");
+				var productCountMatches = productCountRegExp.exec(url);
+				var productInfoRegExp = new RegExp("\\ \\([0-9]+\\)", "g");
+				var name=url.replace(productInfoRegExp,"");
+				console.log(productCountMatches[0]);
+				console.log(name);
 			});
 		</script>
 

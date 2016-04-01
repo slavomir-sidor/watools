@@ -29,31 +29,31 @@ AmazonCategoryBrandsPage.prototype.processPage = function(callback)
 	{
 		var brandsElements = $(".s-see-all-indexbar-column a");
 		var brands = new Array();
-
+		
 		$.each(brandsElements, function(index, brandElement)
 		{
-
 			var element = $(brandElement);
 			var text = element.text();
-			var productCountRegExp = new RegExp("\([0-9]+\)", "g");
-			var productCount = productCountRegExp.exec(text);
 			var url = 'http://www.amazon.com/' + element.attr('href');
-			
-			console.log(productCount);
+			var productCountRegExp = new RegExp("[0-9]+","g");
+			var productInfoRegExp = new RegExp("\\ \\([0-9]+\\)", "g");
+			var productCountMatches = productCountRegExp.exec(text);
+			var productCount=productCountMatches[0];
+			var name=text.replace(productInfoRegExp,"");
 
-			var brand={
-					Name : text,
-					Categories : new Array(),
-					Url : url,
-					ProductCount : 0
-				};
+			var brand =
+			{
+				Name : name,
+				Categories : new Array(),
+				Url : url,
+				ProductCount : productCount
+			};
 
-			var index = brands.push(brand);
-
+			brands.push(brand);
 		});
 
 		console.log('Found ' + brands.length + ' brands.');
-		return;
+		
 		var i = 0;
 		var postBrand = function()
 		{
@@ -63,11 +63,6 @@ AmazonCategoryBrandsPage.prototype.processPage = function(callback)
 			}
 
 			var brand = brands[i];
-
-			console.log('Brand [i] : ' + i);
-			console.log('Brand.Name : ' + brand.Name);
-			console.log('Brand.Url : ' + 'http://www.amazon.com/' + brand.Url);
-			console.log('Brand.API call');
 
 			var settings =
 			{
@@ -84,7 +79,6 @@ AmazonCategoryBrandsPage.prototype.processPage = function(callback)
 				async : false,
 				success : function(data)
 				{
-					console.log('Brand.API done ' + data._id);
 					brands[i] = brand;
 					i++;
 					postBrand();
