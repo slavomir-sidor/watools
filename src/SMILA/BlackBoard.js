@@ -68,7 +68,6 @@ BlackBoard.prototype.saveRecord = function(model, query, data, callback)
 	}, function(err, doc)
 	{
 		console.log(err);
-		console.log(stringify(doc));
 		callback(err, doc);
 	});
 };

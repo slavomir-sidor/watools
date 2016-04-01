@@ -75,9 +75,9 @@ AmazonCategoriesPage.prototype.processPage = function(callback)
 
 						data :
 						{
-							_id : category._id,
 							AmazonCode : category.AmazonCode,
-							letter : letter
+							letter : letter,
+							_id : category._id
 						},
 
 						url : 'http://127.0.0.1:3005/task/Phantom/AmazonCategoryBrandsPage',
@@ -134,7 +134,6 @@ AmazonCategoriesPage.prototype.processPage = function(callback)
 						parentI = parseInt(category.Parent);
 						var parentCategory = main[parentI];
 						category.Parent = parentCategory._id;
-
 						console.log('Category.Parent._id : ' + parentCategory._id);
 					}
 
@@ -143,6 +142,7 @@ AmazonCategoriesPage.prototype.processPage = function(callback)
 					var settings =
 					{
 						type : "POST",
+
 						data :
 						{
 							query :
@@ -151,8 +151,11 @@ AmazonCategoriesPage.prototype.processPage = function(callback)
 							},
 							data : category
 						},
+
 						url : 'http://127.0.0.1:3005/blackboard/record/Category',
+
 						async : false,
+
 						success : function(data)
 						{
 							console.log('Category.API done ' + data._id);
@@ -163,6 +166,7 @@ AmazonCategoriesPage.prototype.processPage = function(callback)
 								for ( var letterIndex in alphabet)
 								{
 									var letter = alphabet[letterIndex];
+
 									runCategoryBrandsTaks(data, letter);
 								}
 							}

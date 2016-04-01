@@ -32,7 +32,7 @@ WorkerManager = function(smila)
 
 	this.smila = smila;
 
-	this.maxThreads = 5;
+	this.maxThreads = 10;
 
 	/**
 	 * Stack

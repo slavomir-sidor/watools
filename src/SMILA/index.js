@@ -13,6 +13,7 @@ var BlackBoard = require('./BlackBoard.js');
 var WorkerManager = require('./WorkerManager.js');
 var util = require('util');
 var fmt = util.format;
+var stringify = require('node-stringify');
 
 SMILA = function(name, port, maxThreads)
 {
@@ -96,13 +97,12 @@ SMILA.prototype.start = function()
 		var worker = req.params.worker;
 		var job = req.params.job;
 		var worker = self.runWorkerJob(worker, job, req.body);
-		
+
 		var worker={
 			command:worker.command,
 			args:worker.args
 		};
-		console.log(req.body);
-		console.log(worker);
+
 		res.json(worker);
 	});
 

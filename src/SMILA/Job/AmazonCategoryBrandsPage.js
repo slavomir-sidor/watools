@@ -79,7 +79,7 @@ AmazonCategoryBrandsPage.prototype.processPage = function(callback)
 				async : false,
 				success : function(data)
 				{
-					brands[i] = brand;
+					brands[i] = data;
 					i++;
 					postBrand();
 				},
