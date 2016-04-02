@@ -24,7 +24,7 @@ AmazonCategoryBrandsPage.prototype.processPage = function(callback)
 	Webpage.prototype.processPage.call(this, callback);
 
 	var self = this;
-
+	
 	var brands = this.getPage().evaluate(function()
 	{
 		var brandsElements = $(".s-see-all-indexbar-column a");
@@ -51,6 +51,11 @@ AmazonCategoryBrandsPage.prototype.processPage = function(callback)
 
 			brands.push(brand);
 		});
+		
+		var postGoogleLogo=function(brand)
+		{
+			//AmazonBrandGoogleLogo
+		};
 
 		console.log('Found ' + brands.length + ' brands.');
 		
@@ -80,6 +85,7 @@ AmazonCategoryBrandsPage.prototype.processPage = function(callback)
 				success : function(data)
 				{
 					brands[i] = data;
+					postGoogleLogo(data);
 					i++;
 					postBrand();
 				},
