@@ -87,9 +87,28 @@ SMILA.prototype.start = function()
 	/**
 	 * Tasks
 	 */
-	this.app.get('/tasks', function(req, res)
+	this.app.get('/tasks/page/:page', function(req, res)
 	{
-		res.send(self.workerManager.tasks);
+		var page=req.params.page;
+		var limit=10;
+		var offset=(page-1)*limit;
+		var total=self.workerManager.getTasksCount();
+		var pages=Math.ceil(total/limit);
+		var tasks=self.workerManager.getTasks(limit, offset);
+
+		var result={
+			paggination:{
+				total: total,
+				pages:pages,
+				page:page,
+				limit:limit,
+				count:tasks.length,
+				offset:offset
+			},
+			tasks:tasks
+		};
+
+		res.json(result);
 	});
 
 	this.app.post('/task/:worker/:job', function(req, res)
@@ -115,6 +134,14 @@ SMILA.prototype.start = function()
 	});
 
 	/**
+	 * Processes
+	 */
+	this.app.get('/processes', function(req, res)
+	{
+		res.json(self.workerManager.getProcesses());
+	});
+
+	/**
 	 * Blackboard
 	 */
 	this.app.get('/blackboard', function(req, res)
@@ -136,11 +163,33 @@ SMILA.prototype.start = function()
 	/**
 	 * Blackboard Records
 	 */
-	this.app.get('/blackboard/record/:model', function(req, res)
+	this.app.get('/blackboard/record/:model/page/:page', function(req, res)
 	{
-		self.blackBoard.getRecords(req.params.model, req.body, function(err, records)
-		{
-			res.json(records);
+		var recordsCount=self.blackBoard.getRecordsCount(req.params.model, req.body, function(err,data){
+
+			var page=req.params.page;
+			var limit=10;
+			var offset=(page-1)*limit;
+			var total=data;
+			var pages=Math.ceil(total/limit);
+			
+			self.blackBoard.getRecords(req.params.model, req.body, limit ,offset, function(err, records)
+					{
+						var result={
+								paggination:{
+									total: data,
+									pages:pages,
+									page:page,
+									limit:limit,
+									count:records.length,
+									offset:offset
+								},
+								records:records
+						};
+
+						res.json(result);
+					});
+			
 		});
 	});
 

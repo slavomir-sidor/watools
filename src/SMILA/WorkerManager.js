@@ -82,6 +82,61 @@ WorkerManager.prototype.runProcess = function()
 	}
 }
 
+/**
+ * Gets currently running processes.
+ * 
+ * Commands, arguments, pids.
+ * 
+ * @returns {Array}
+ */
+WorkerManager.prototype.getProcesses = function()
+{
+	var results = new Array();
+
+	for (process in this.processes)
+	{
+		var result =
+		{
+			command : process.command,
+			args : process.args
+		};
+
+		results.push(result);
+	}
+
+	return results;
+}
+
+/**
+ * Gets tasks waiting for process count
+ * 
+ * @returns int
+ */
+WorkerManager.prototype.getTasksCount = function()
+{
+	return this.tasks.length;
+}
+
+/**
+ * Gets tasks waiting for process count
+ * 
+ * @returns {Array}
+ */
+WorkerManager.prototype.getTasks = function(limit, offset)
+{
+	var results = new Array();
+	var max = offset + limit;
+	var i = offset;
+	
+	while (i < max && i < this.tasks.length)
+	{
+		results.push(this.tasks[i]);
+		i++;
+	}
+
+	return results;
+}
+
 WorkerManager.prototype.onProcessFinish = function(index)
 {
 	this.processes.splice(index, 1);

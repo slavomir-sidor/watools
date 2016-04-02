@@ -52,10 +52,16 @@ BlackBoard.prototype.getModel = function(model)
 	return models[model];
 };
 
-BlackBoard.prototype.getRecords = function(model, data, callback)
+BlackBoard.prototype.getRecords = function(model, data, limit,offset, callback)
 {
 	var entity = this.mongoose.model(model);
-	entity.find(data, callback);
+	entity.find(data, callback).skip(offset).limit(limit);
+};
+
+BlackBoard.prototype.getRecordsCount = function(model, data, callback)
+{
+	var entity = this.mongoose.model(model);
+	return entity.find(data).count(callback);
 };
 
 BlackBoard.prototype.saveRecord = function(model, query, data, callback)
