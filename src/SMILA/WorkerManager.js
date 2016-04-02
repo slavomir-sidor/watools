@@ -83,32 +83,108 @@ WorkerManager.prototype.runProcess = function()
 }
 
 /**
+ * Gets tasks waiting for process count
+ * 
+ * @returns int
+ */
+WorkerManager.prototype.getProcessesCount = function()
+{
+	return this.processes.length;
+}
+
+/**
  * Gets currently running processes.
  * 
  * Commands, arguments, pids.
  * 
  * @returns {Array}
  */
-WorkerManager.prototype.getProcesses = function()
+WorkerManager.prototype.getProcesses = function(offset, limit)
 {
 	var results = new Array();
+	var i = offset;
+	var max = offset + limit;
 
-	for (process in this.processes)
+	while (i < max && i < this.getProcessesCount())
 	{
+		var process = this.processes[i];
 		var result =
 		{
 			command : process.command,
-			args : process.args
+			args : process.args,
+			pid:process.spawn.pid
 		};
-
 		results.push(result);
+		i++;
+	}
+
+	return results;
+}
+
+
+/**
+ * Gets workers count
+ * 
+ * @returns int
+ */
+WorkerManager.prototype.getJobsCount = function()
+{
+	return this.jobs.length;
+}
+
+/**
+ * Gets jobs
+ * 
+ * @returns {Array}
+ */
+WorkerManager.prototype.getJobs = function(offset, limit)
+{
+	var results = new Array();
+	var max = offset + limit;
+	var i = offset;
+
+	while (i < max && i < this.jobs.length)
+	{
+		results.push(this.jobs[i]);
+		i++;
 	}
 
 	return results;
 }
 
 /**
+ * Gets workers count
+ * 
+ * @returns int
+ */
+WorkerManager.prototype.getWorkersCount = function()
+{
+	return this.workers.length;
+}
+
+/**
  * Gets tasks waiting for process count
+ * 
+ * @returns {Array}
+ */
+WorkerManager.prototype.getWorkers = function(offset, limit)
+{
+	var results = new Array();
+	var max = offset + limit;
+	var i = offset;
+	console.log(this.workers.length);
+
+	while (i < max && i < this.workers.length)
+	{
+		results.push(this.workers[i]);
+		i++;
+	}
+
+	return results;
+}
+
+/**
+ * Gets tasks count waiting for process
  * 
  * @returns int
  */
@@ -122,12 +198,12 @@ WorkerManager.prototype.getTasksCount = function()
  * 
  * @returns {Array}
  */
-WorkerManager.prototype.getTasks = function(limit, offset)
+WorkerManager.prototype.getTasks = function(offset, limit)
 {
 	var results = new Array();
 	var max = offset + limit;
 	var i = offset;
-	
+
 	while (i < max && i < this.tasks.length)
 	{
 		results.push(this.tasks[i]);

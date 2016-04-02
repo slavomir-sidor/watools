@@ -11,6 +11,7 @@ var bodyParser = require('body-parser');
 var Promise = require('promise');
 var BlackBoard = require('./BlackBoard.js');
 var WorkerManager = require('./WorkerManager.js');
+var Pagination = require('./Pagination.js');
 var util = require('util');
 var fmt = util.format;
 var stringify = require('node-stringify');
@@ -79,9 +80,22 @@ SMILA.prototype.start = function()
 	/**
 	 * Jobs
 	 */
-	this.app.get('/jobs', function(req, res)
+	this.app.get('/jobs/page/:page', function(req, res)
 	{
-		res.send(self.workerManager.jobs);
+		var p=new Pagination(
+			self.workerManager.getJobsCount(),
+			req.params.page
+		);
+					
+		var items=self.workerManager.getJobs(
+			p.getOffset(),
+			p.getLimit()
+		);
+
+		res.json({
+			paggination : p,
+			items : items
+		});
 	});
 
 	/**
@@ -89,26 +103,20 @@ SMILA.prototype.start = function()
 	 */
 	this.app.get('/tasks/page/:page', function(req, res)
 	{
-		var page=req.params.page;
-		var limit=10;
-		var offset=(page-1)*limit;
-		var total=self.workerManager.getTasksCount();
-		var pages=Math.ceil(total/limit);
-		var tasks=self.workerManager.getTasks(limit, offset);
+		var p=new Pagination(
+			self.workerManager.getTasksCount(),
+			req.params.page
+		);
 
-		var result={
-			paggination:{
-				total: total,
-				pages:pages,
-				page:page,
-				limit:limit,
-				count:tasks.length,
-				offset:offset
-			},
-			tasks:tasks
-		};
+		var items=self.workerManager.getTasks(
+			p.getOffset(),
+			p.getLimit()
+		);
 
-		res.json(result);
+		res.json({
+			paggination : p,
+			items : items
+		});
 	});
 
 	this.app.post('/task/:worker/:job', function(req, res)
@@ -128,17 +136,44 @@ SMILA.prototype.start = function()
 	/**
 	 * Workers
 	 */
-	this.app.get('/workers', function(req, res)
+	this.app.get('/workers/page/:page', function(req, res)
 	{
-		res.json(self.workerManager.workers);
+		var p=new Pagination(
+			self.workerManager.getWorkersCount(),
+			req.params.page
+		);
+				
+		var items=self.workerManager.getWorkers(
+			p.getOffset(),
+			p.getLimit()
+		);
+
+		res.json({
+			paggination : p,
+			items : items
+		});
+
 	});
 
 	/**
 	 * Processes
 	 */
-	this.app.get('/processes', function(req, res)
+	this.app.get('/processes/page/:page', function(req, res)
 	{
-		res.json(self.workerManager.getProcesses());
+		var p=new Pagination(
+			self.workerManager.getProcessesCount(),
+			req.params.page
+		);
+
+		var items=self.workerManager.getProcesses(
+			p.getOffset(),
+			p.getLimit()
+		);
+
+		res.json({
+			paggination : p,
+			items : items
+		});
 	});
 
 	/**
