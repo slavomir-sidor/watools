@@ -112,7 +112,7 @@ WorkerManager.prototype.getProcesses = function(offset, limit)
 		{
 			command : process.command,
 			args : process.args,
-			pid:process.spawn.pid
+			pid : process.spawn.pid
 		};
 		results.push(result);
 		i++;
@@ -120,7 +120,6 @@ WorkerManager.prototype.getProcesses = function(offset, limit)
 
 	return results;
 }
-
 
 /**
  * Gets workers count
@@ -159,7 +158,14 @@ WorkerManager.prototype.getJobs = function(offset, limit)
  */
 WorkerManager.prototype.getWorkersCount = function()
 {
-	return this.workers.length;
+	var workers = new Array();
+
+	for ( var worker in this.workers)
+	{
+		workers.push(worker);
+	}
+
+	return workers.length;
 }
 
 /**
@@ -169,13 +175,13 @@ WorkerManager.prototype.getWorkersCount = function()
  */
 WorkerManager.prototype.getWorkers = function(offset, limit)
 {
-	var workers=new Array();
+	var workers = new Array();
 
-	for(var worker in this.workers)
+	for ( var worker in this.workers)
 	{
 		workers.push(worker);
 	}
-	
+
 	var results = new Array();
 	var max = offset + limit;
 	var i = offset;
