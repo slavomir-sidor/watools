@@ -1,24 +1,68 @@
-var page = require('webpage').create();
+var web = require('./Webpage.js');
+var system = require('system');
+var args = system.args;
 
-console.log('The default user agent is ' + page.settings.userAgent);
+CURL = function()
+{
+	this.page;
+	this.url = 'http://localhost/';
 
-page.settings.userAgent = 'Web Tests';
+	this.pageViewportSize =
+	{
+		width : 1920,
+		height : 1200
+	};
+}
 
-page.open('http://www.amazon.com', function(status) {
+CURL.prototype = new Webpage();
+CURL.prototype.constructor = CURL;
+CURL.prototype.processPage = function(callback)
+{
+	Webpage.prototype.processPage.call(this, callback);
 
-	if (status !== 'success') {
+	var self = this;
 
-		console.log('Unable to access network');
+	this.page.evaluate(function(self)
+	{
+		console.log('CURL is running');
 
-	} else {
+		var post = function()
+		{
+			console.log('CURL API Call..');
 
-		var ua = page.evaluate(function() {
-			return document.getElementById('myagent').textContent;
-		});
+			var settings =
+			{
+				type : "POST",
 
-		console.log(ua);
+				url : 'http://127.0.0.1:3005/task/Phantom/Google',
 
-	}
+				async : false,
 
-	phantom.exit();
-});
+				success : function(data)
+				{
+					console.log('CURL API Call Done');
+				},
+
+				error : function(data)
+				{
+
+					console.log('CURL API Call Error');
+				}
+			};
+
+			$.ajax(settings);
+		};
+
+		post();
+		post();
+
+		console.log('CURL done');
+
+	});
+
+	callback();
+
+}
+
+var gl = new CURL();
+gl.process();

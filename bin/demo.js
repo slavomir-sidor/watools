@@ -1,4 +1,11 @@
-var url="A & R Allied Enterprise, Inc. (1)";
+var processes = {};
 
-var productCountRegExp = new RegExp("[0-9]+");
-var productCount = productCountRegExp.exec(url);
+processes.aaa='asdasdasd';
+processes.bbb='asdasdasasdasdda';
+processes.ccc='afkgjksjdsdsd';
+
+console.log(processes);
+
+delete processes.ccc;
+
+console.log(processes);

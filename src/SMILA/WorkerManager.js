@@ -46,13 +46,14 @@ WorkerManager = function(smila)
 
 	this.workers = workers;
 
-	this.processes = new Array();
+	this.processes = {};
 };
 
 WorkerManager.prototype.runWorker = function(name, job, input)
 {
 	var worker = new this.workers[name](job, input);
 	this.tasks.push(worker);
+
 	this.runProcess();
 
 	return worker;
@@ -69,17 +70,27 @@ WorkerManager.prototype.runProcess = function()
 	{
 		var self = this;
 
-		while (this.processes.length < this.maxThreads && this.tasks.length > 0)
+		console.log('Process count: ' + this.getProcessesCount());
+
+		while (this.getProcessesCount() < this.maxThreads && this.tasks.length > 0)
 		{
 			var process = this.tasks.shift();
-			var index = this.processes.push(process);
-
+			this.processes
 			process.runJob(function()
 			{
-				self.onProcessFinish(index);
+				var pid=process.spawn.pid;
+				
+				self.onProcessFinish(pid);
 			});
 		}
 	}
+}
+
+
+WorkerManager.prototype.onProcessFinish = function(pid)
+{
+	delete this.processes[pid];
+	this.runProcess();
 }
 
 /**
@@ -89,7 +100,14 @@ WorkerManager.prototype.runProcess = function()
  */
 WorkerManager.prototype.getProcessesCount = function()
 {
-	return this.processes.length;
+	var count=0;
+
+	for( var process in this.processes )
+	{
+		++count;
+	}
+
+	return count;
 }
 
 /**
@@ -200,6 +218,16 @@ WorkerManager.prototype.getWorkers = function(offset, limit)
  * 
  * @returns int
  */
+WorkerManager.prototype.deleteTask = function(id)
+{
+	this.tasks.splice( id, 1 );
+}
+
+/**
+ * Gets tasks count waiting for process
+ * 
+ * @returns int
+ */
 WorkerManager.prototype.getTasksCount = function()
 {
 	return this.tasks.length;
@@ -218,17 +246,13 @@ WorkerManager.prototype.getTasks = function(offset, limit)
 
 	while (i < max && i < this.tasks.length)
 	{
-		results.push(this.tasks[i]);
+		var task = this.tasks[i];
+		task.id = i;
+		results.push(task);
 		i++;
 	}
 
 	return results;
-}
-
-WorkerManager.prototype.onProcessFinish = function(index)
-{
-	this.processes.splice(index, 1);
-	this.runProcess();
 }
 
 WorkerManager.prototype.getJobs = function()

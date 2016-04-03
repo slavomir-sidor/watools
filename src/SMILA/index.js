@@ -74,6 +74,8 @@ SMILA.prototype.start = function()
 	{
 		res.header("Access-Control-Allow-Origin", "*");
 		res.header("Access-Control-Allow-Headers", "X-Requested-With");
+		res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE");
+
 		next();
 	});
 
@@ -86,7 +88,7 @@ SMILA.prototype.start = function()
 			self.workerManager.getJobsCount(),
 			req.params.page
 		);
-					
+
 		var items=self.workerManager.getJobs(
 			p.getOffset(),
 			p.getLimit()
@@ -117,6 +119,14 @@ SMILA.prototype.start = function()
 			paggination : p,
 			items : items
 		});
+
+	});
+	
+	this.app.delete('/task/:id', function(req, res)
+	{
+		var id = req.params.id;
+		self.workerManager.deleteTask(id);
+		res.json();
 	});
 
 	this.app.post('/task/:worker/:job', function(req, res)
