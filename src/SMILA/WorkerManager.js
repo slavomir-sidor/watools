@@ -169,14 +169,20 @@ WorkerManager.prototype.getWorkersCount = function()
  */
 WorkerManager.prototype.getWorkers = function(offset, limit)
 {
+	var workers=new Array();
+
+	for(var worker in this.workers)
+	{
+		workers.push(worker);
+	}
+	
 	var results = new Array();
 	var max = offset + limit;
 	var i = offset;
-	console.log(this.workers.length);
 
-	while (i < max && i < this.workers.length)
+	while (i < max && i < workers.length)
 	{
-		results.push(this.workers[i]);
+		results.push(workers[i]);
 		i++;
 	}
 
