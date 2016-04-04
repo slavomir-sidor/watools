@@ -53,8 +53,10 @@ CURL.prototype.processPage = function(callback)
 			$.ajax(settings);
 		};
 
-		post();
-		post();
+		for (i = 0; i <= 50; i++)
+		{
+			post();
+		}
 
 		console.log('CURL done');
 

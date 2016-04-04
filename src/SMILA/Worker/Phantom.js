@@ -44,7 +44,7 @@ Phantom = function(job, args)
 	this.args = spawnArgs;
 };
 
-Phantom.prototype.runJob = function(callback)
+Phantom.prototype.runJob = function(startCallback, finishCallback)
 {
 	console.log('Runnig process: ' + this.command);
 	console.log('Runnig process args: ' + stringify(this.args));
@@ -53,6 +53,7 @@ Phantom.prototype.runJob = function(callback)
 	 * 
 	 */
 	this.spawn = spawn(this.command, this.args);
+	startCallback();
 
 	/**
 	 * 
@@ -70,7 +71,7 @@ Phantom.prototype.runJob = function(callback)
 	this.spawn.on('close', function(code, signal)
 	{
 		console.log('child process terminated with code ' + code);
-		callback();
+		finishCallback();
 	});
 
 	this.spawn.on('message', function(msg)

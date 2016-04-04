@@ -75,17 +75,17 @@ WorkerManager.prototype.runProcess = function()
 		while (this.getProcessesCount() < this.maxThreads && this.tasks.length > 0)
 		{
 			var process = this.tasks.shift();
-			this.processes
+
 			process.runJob(function()
 			{
-				var pid=process.spawn.pid;
-				
-				self.onProcessFinish(pid);
+				self.processes[process.spawn.pid] = process;
+			}, function()
+			{
+				self.onProcessFinish(process.spawn.pid);
 			});
 		}
 	}
 }
-
 
 WorkerManager.prototype.onProcessFinish = function(pid)
 {
@@ -100,9 +100,9 @@ WorkerManager.prototype.onProcessFinish = function(pid)
  */
 WorkerManager.prototype.getProcessesCount = function()
 {
-	var count=0;
+	var count = 0;
 
-	for( var process in this.processes )
+	for ( var process in this.processes)
 	{
 		++count;
 	}
@@ -119,21 +119,18 @@ WorkerManager.prototype.getProcessesCount = function()
  */
 WorkerManager.prototype.getProcesses = function(offset, limit)
 {
-	var results = new Array();
-	var i = offset;
-	var max = offset + limit;
+	var results=new Array();
 
-	while (i < max && i < this.getProcessesCount())
+	for(var process in this.processes)
 	{
-		var process = this.processes[i];
 		var result =
 		{
 			command : process.command,
 			args : process.args,
 			pid : process.spawn.pid
 		};
+
 		results.push(result);
-		i++;
 	}
 
 	return results;
@@ -220,7 +217,7 @@ WorkerManager.prototype.getWorkers = function(offset, limit)
  */
 WorkerManager.prototype.deleteTask = function(id)
 {
-	this.tasks.splice( id, 1 );
+	this.tasks.splice(id, 1);
 }
 
 /**
