@@ -15,13 +15,13 @@ function AmazonBrandProductsPage(amazonCode, letter, categoryId)
 	this.categoryId = categoryId;
 	this.url = "http://www.amazon.com/gp/search/other?page=1&pickerToList=brandtextbin&rh=n:" + amazonCode
 			+ "&indexField=" + letter;
-}
+};
 
 AmazonBrandProductsPage.prototype = new Webpage();
 AmazonBrandProductsPage.prototype.constructor = AmazonBrandProductsPage;
 AmazonBrandProductsPage.prototype.processPage = function(callback)
 {
-	Webpage.prototype.processPage.call(this, callback);
+	Webpage.prototype.prcessPage.call(this, callback);
 
 	var self = this;
 
@@ -32,7 +32,6 @@ AmazonBrandProductsPage.prototype.processPage = function(callback)
 
 		$.each(brandsElements, function(index, brandElement)
 		{
-
 			var brandElement = $(brandElement);
 			var brandText = $(brandElement).text();
 			var productCountRegExp = new RegExp("\([0-9]+\)");
@@ -46,58 +45,9 @@ AmazonBrandProductsPage.prototype.processPage = function(callback)
 				Url : brandUrl,
 				ProductCount : 0
 			});
-
 		});
 
 		console.log('Found ' + brands.length + ' brands.');
-		return;
-		var i = 0;
-		var processBrand = function()
-		{
-			if (i >= brands.length)
-			{
-				return;
-			}
-
-			var brand = brands[i];
-
-			console.log('Brand [i] : ' + i);
-			console.log('Brand.Name : ' + brand.Name);
-			console.log('Brand.Url : ' + 'http://www.amazon.com/' + brand.Url);
-			console.log('Brand.API call');
-
-			var settings =
-			{
-				type : "POST",
-				data :
-				{
-					query :
-					{
-						Name : brand.Name
-					},
-					data : brand
-				},
-				url : 'http://127.0.0.1:3005/blackboard/record/Brand',
-				async : false,
-				success : function(data)
-				{
-					console.log('Brand.API done ' + data._id);
-					brands[i] = brand;
-					i++;
-					processBrand();
-				},
-
-				error : function(data)
-				{
-					i++;
-					processBrand();
-				}
-			};
-
-			$.ajax(settings);
-
-		};
-
 		processBrand();
 	});
 

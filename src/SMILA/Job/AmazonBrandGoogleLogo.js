@@ -10,12 +10,13 @@ AmazonBrandGoogleLogo = function(brandName, brandId)
 
 	this.url = 'https://www.google.cz/search?safe=off&tbm=isch&q="' + this.brandName.replace(" ", "+")
 			+ '"+company+logo&cad=h';
+
 	this.pageViewportSize =
 	{
 		width : 1920,
 		height : 1200
 	};
-}
+};
 
 AmazonBrandGoogleLogo.prototype = new Webpage();
 AmazonBrandGoogleLogo.prototype.constructor = AmazonBrandGoogleLogo;
@@ -33,7 +34,7 @@ AmazonBrandGoogleLogo.prototype.processPage = function(callback)
 			Name : self.brandName,
 			Logo : source
 		};
-		
+
 		var postBrand = function(brand)
 		{
 			var settings =
@@ -47,8 +48,11 @@ AmazonBrandGoogleLogo.prototype.processPage = function(callback)
 					},
 					data : brand
 				},
+
 				url : 'http://127.0.0.1:3005/blackboard/record/Brand',
+
 				async : false,
+
 				success : function(data)
 				{
 					return data;
@@ -59,6 +63,7 @@ AmazonBrandGoogleLogo.prototype.processPage = function(callback)
 					return data;
 				}
 			};
+
 			$.ajax(settings);
 		};
 

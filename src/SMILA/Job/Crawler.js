@@ -79,6 +79,7 @@ Crawler.prototype.logExtented = function(msg)
 Crawler.prototype.finish = function(status)
 {
 	this.log('Finish: ' + status);
+
 	phantom.exit(1);
 }
 
@@ -102,8 +103,9 @@ Crawler.prototype.onPageLoadFinished = function(status, callback)
 
 			self.processPage(function()
 			{
-				console.log('Prcess Page callback');
+				console.log('Process Page callback');
 			});
+
 			self.finish(status);
 		});
 	}
