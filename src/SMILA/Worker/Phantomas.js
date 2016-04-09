@@ -17,8 +17,14 @@ var stringify = require('node-stringify');
  */
 Phantomas = function(command, args, restarts, restartDelay, onStdout, onSterr)
 {
+	/**
+	 * Phantomas
+	 */
 	this.command = "phantomas";
 
+	/**
+	 * Args 
+	 */
 	this.args = args;
 
 	/**
@@ -31,10 +37,19 @@ Phantomas = function(command, args, restarts, restartDelay, onStdout, onSterr)
 	 */
 	this.restartDelay;
 
+	/**
+	 * On Stdout
+	 */
 	this.onStdout;
 
+	/**
+	 * On Stderr
+	 */
 	this.onSterr;
 
+	/**
+	 * Process
+	 */
 	this.process = Spawn(
 	{
 		cmd : this.command,

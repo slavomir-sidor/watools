@@ -32,8 +32,14 @@ Phantom = function(job, args)
 	 */
 	this.restartDelay;
 
+	/**
+	 * 
+	 */
 	var spawnArgs = new Array();
 
+	/**
+	 * 
+	 */
 	spawnArgs.push('src/SMILA/Job/' + job + '.js');
 
 	for ( var name in args)
@@ -41,18 +47,28 @@ Phantom = function(job, args)
 		spawnArgs.push(args[name]);
 	}
 
+	/**
+	 * 
+	 */
 	this.args = spawnArgs;
 };
 
+/**
+ * Run Job
+ */
 Phantom.prototype.runJob = function(startCallback, finishCallback)
 {
 	console.log('Runnig process: ' + this.command);
 	console.log('Runnig process args: ' + stringify(this.args));
-	
+
 	/**
-	 * 
+	 * Spawn
 	 */
 	this.spawn = spawn(this.command, this.args);
+
+	/**
+	 * Start Callback
+	 */
 	startCallback();
 
 	/**
@@ -60,12 +76,12 @@ Phantom.prototype.runJob = function(startCallback, finishCallback)
 	 */
 	this.spawn.stdout.on('data', function(data)
 	{
-		console.log(''+data);
+		console.log('' + data);
 	});
 
 	this.spawn.stderr.on('data', function(data)
 	{
-		console.log(''+data);
+		console.log('' + data);
 	});
 
 	this.spawn.on('close', function(code, signal)

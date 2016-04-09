@@ -17,16 +17,26 @@ var stringify = require('node-stringify');
  */
 Worker = function(command, args, restarts)
 {
+	/**
+	 * Command
+	 */
 	this.command = command;
 
+	/**
+	 * Args
+	 */
 	this.args = args;
 
 	/**
+	 * Restart
+	 * 
 	 * -1: forever 0: no restarts x: restart x-times
 	 */
 	this.restarts = 0;
 
 	/**
+	 * Restart Delay
+	 * 
 	 * restartDelay - Decimal - (opt) Delay between restarts
 	 */
 	this.restartDelay;
@@ -36,9 +46,15 @@ Worker.prototype.start = function()
 {
 	console.log('Runnig process: ' + this.command);
 	console.log('Runnig process args: ' + stringify(this.args));
+
 	this.spawn.start();
 };
 
+/**
+ * On Stdout
+ * 
+ * @param data
+ */
 Worker.prototype.onStdout = function(data)
 {
 	console.log(data);
