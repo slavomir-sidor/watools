@@ -1,39 +1,37 @@
 {
-  "required" : true ,
-  "$schema" : "http://json-schema.org/draft-03/schema" ,
-  "type" : "object" ,
-  "properties" : {
-    "complete" : {
-      "type" : "boolean" ,
-      "required" : false
-    } ,
-    "created_at" : {
-      "type" : "string" ,
-      "required" : false
-    } ,
-    "description" : {
-      "type" : "string" ,
-      "required" : false
-    } ,
-    "id" : {
-      "type" : "number" ,
-      "required" : false
-    } ,
-    "kind" : {
-      "type" : "string" ,
-      "required" : false
-    } ,
-    "position" : {
-      "type" : "number" ,
-      "required" : false
-    } ,
-    "story_id" : {
-      "type" : "number" ,
-      "required" : false
-    } ,
-    "updated_at" : {
-      "type" : "string" ,
-      "required" : false
-    }
-  }
+	"required": true,
+	"$schema": "http://json-schema.org/draft-03/schema",
+	"type": "object",
+	"properties": 
+	{
+		"pid": 
+		{
+			"type": "number",
+			"required": false
+		},
+
+		"command": 
+		{
+			"type": "string",
+			"required": false
+		},
+
+		"arguments": 
+		{
+			"type": "string",
+			"required": false
+		},
+
+		"memory": 
+		{
+			"type": "number",
+			"required": false
+		},
+
+		"cpu": 
+		{
+			"type": "string",
+			"required": false
+		}
+	}
 }

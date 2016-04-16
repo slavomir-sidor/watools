@@ -1,21 +1,23 @@
 #%RAML 0.8
+
 title: Web Automation Tools
 version: 0.0.1-SNAPSHOT
 baseUri: https://127.0.0.1:3005/{version}/
 mediaType: application/json
 schemas:
   - Smila/Worker: !include schema/Worker.json
-  - Smila/Task: !include schema/Task.json
-  - Smila/Process: !include schema/Process.json
-  - Smila/Job: !include schema/Job.json
-  - Smila/Model: !include schema/Model.json
-  - Smila/Record: !include schema/Record.json
+
+resourceTypes:
+  - member: !include resourceTypes/member.raml
+  - base: !include resourceTypes/base.raml
+  - collection: !include resourceTypes/collection.raml
+  - activityType: !include resourceTypes/activityType.raml
 
 traits:
   - pageable: !include traits/pageable.raml
 
 /workers: 
-  type: collection
+  type: { collection: { type: notification } }
   get: 
     description: |
       Web Automation Tools Workers
@@ -24,4 +26,3 @@ traits:
         body: 
           application/json: 
             schema: Smila/Worker
-            example: !include examples/Worker.json
