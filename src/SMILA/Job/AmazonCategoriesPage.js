@@ -22,14 +22,15 @@ AmazonCategoriesPage.prototype.processPage = function(callback)
 	var categories = this.getPage().evaluate(
 			function()
 			{
-				var groups = $(".fsdDeptBox");
+				var groups = $(".popover-grouping");
+				
 				var main = new Array();
 				var alphabet = new Array('#', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
 						'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z');
 
 				$.each(groups, function(index, value)
 				{
-					var top = $('.fsdDeptTitle', $(value));
+					var top = $('.popover-category-name', $(value));
 
 					var category =
 					{
@@ -40,7 +41,7 @@ AmazonCategoriesPage.prototype.processPage = function(callback)
 
 					var index = main.push(category);
 
-					var subs = $('.fsdDeptCol a.fsdDeptLink', $(value));
+					var subs = $('.nav_cat_links a', $(value));
 
 					var parentIndex = index - 1;
 
