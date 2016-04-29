@@ -92,7 +92,7 @@ Phantom.prototype.runJob = function(startCallback, finishCallback)
 
 	this.spawn.on('message', function(msg)
 	{
-		console.log('MEssage ' + msg);
+		console.log('Message ' + msg);
 	});
 };
 

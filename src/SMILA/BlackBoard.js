@@ -4,6 +4,8 @@
 
 var requireDir = require('require-dir');
 var stringify = require('node-stringify');
+var mongoose = require('mongoose');
+var mongooseQ = require('mongoose-q')(mongoose);
 
 BlackBoard = function(name)
 {
@@ -11,7 +13,8 @@ BlackBoard = function(name)
 
 	this.name = name;
 	this.uristring = 'mongodb://localhost/' + this.name;
-	this.mongoose = require('mongoose');
+	this.mongoose = mongoose;
+	this.mongooseQ = mongooseQ;
 
 	var self = this;
 
@@ -37,7 +40,10 @@ BlackBoard.prototype.onOpen = function()
 {
 	console.log('BlackBoard Succeeded connected to: ' + this.uristring);
 
-	this.models = requireDir('./Model/');
+	this.models = requireDir('./Model/',
+	{
+		recurse: true
+	});
 };
 
 BlackBoard.prototype.getModels = function()
@@ -67,20 +73,19 @@ BlackBoard.prototype.getRecordsCount = function(model, data, callback)
 BlackBoard.prototype.saveRecord = function(model, query, data, callback)
 {
 	var entity = this.mongoose.model(model);
-	entity.findOneAndUpdate(query, data,
+
+	entity.findOneAndUpdateQ(query, data,
 	{
 		new:true,
 		upsert : true
 	}, function(err, doc)
 	{
-		console.log(err);
 		callback(err, doc);
 	});
 };
 
 BlackBoard.prototype.deleteRecords = function(model, data, callback)
 {
-	console.log(data);
 	var entity = this.mongoose.model(model);
 	entity.find(data).remove();
 };

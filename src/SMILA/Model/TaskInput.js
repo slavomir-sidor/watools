@@ -10,6 +10,17 @@ var TaskInput = mongoose.model('TaskInput',
 	{
 		type : Schema.Types.ObjectId,
 		ref : 'Task'
+	},
+
+	JobInput :
+	{
+		type : Schema.Types.ObjectId,
+		ref : 'JobInput'
+	},
+
+	Value :
+	{
+		type : "string"
 	}
 });
 

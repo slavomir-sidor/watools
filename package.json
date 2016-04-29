@@ -65,6 +65,13 @@
 		"jscs": "^1.11.3",
 		"karma": "*",
 		"request": "^2.53.0",
-		"tap": "^0.7.1"
+		"tap": "^0.7.1",
+		"raml-express-mongoose-scaffolder": "*"
+	},
+
+	"repository": 
+	{
+		"type": "git",
+		"url": "git@github.com:slavomirkuzma/raml-express-mongoose-scaffolder.git"
 	}
 }

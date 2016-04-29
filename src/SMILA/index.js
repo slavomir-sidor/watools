@@ -1,3 +1,4 @@
+
 /**
  * Semantic Information Logistic Architecture
  * 
@@ -46,7 +47,6 @@ SMILA = function(name, port, maxThreads)
 
 SMILA.prototype.runWorkerJob = function(worker, job, params)
 {
-	console.log(params);
 	return this.workerManager.runWorker(worker, job, params);
 };
 
@@ -304,6 +304,10 @@ SMILA.prototype.start = function()
 	{
 		req.io.route('hello');
 		// res.send(stringify(this));
+	});
+	
+	this.io.on('connection', function (socket) {
+	    console.log('client connected!'); 
 	});
 
 	return this.app;

@@ -83,6 +83,14 @@ WorkerManager.prototype.runProcess = function()
 			{
 				self.onProcessFinish(process.spawn.pid);
 			});
+
+			/**
+			 * var data={ Command:process.command, Arguments:process.args }
+			 * self.smila.blackBoard.saveRecord('Process', {}, , function(error,
+			 * doc) {
+			 * 
+			 * });
+			 */
 		}
 	}
 }
@@ -119,15 +127,22 @@ WorkerManager.prototype.getProcessesCount = function()
  */
 WorkerManager.prototype.getProcesses = function(offset, limit)
 {
-	var results=new Array();
+	var results = new Array();
 
-	for(var process in this.processes)
+	for ( var pid in this.processes)
 	{
+		var process = this.processes[pid];
+		var memory = 0;
+		var cpu = 0;
+
 		var result =
 		{
 			command : process.command,
 			args : process.args,
-			pid : process.spawn.pid
+			pid : pid,
+			memory : memory,
+			cpu : cpu
+
 		};
 
 		results.push(result);
