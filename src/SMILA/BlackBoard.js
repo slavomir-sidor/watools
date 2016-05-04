@@ -52,7 +52,6 @@ BlackBoard.prototype.getModels = function()
 BlackBoard.prototype.getModel = function(model)
 {
 	var models = this.mongoose.modelSchemas;
-
 	return models[model];
 };
 
@@ -72,7 +71,7 @@ BlackBoard.prototype.saveRecord = function(model, query, data, callback)
 {
 	var entity = this.mongoose.model(model);
 
-	entity.findOneAndUpdateQ(query, data,
+	entity.findOneAndUpdate(query, data,
 	{
 		new:true,
 		upsert : true
