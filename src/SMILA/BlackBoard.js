@@ -5,7 +5,6 @@
 var requireDir = require('require-dir');
 var stringify = require('node-stringify');
 var mongoose = require('mongoose');
-var mongooseQ = require('mongoose-q')(mongoose);
 
 BlackBoard = function(name)
 {
