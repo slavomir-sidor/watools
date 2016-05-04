@@ -2,7 +2,7 @@ var q = require('./Webpage.js');
 
 Google = function()
 {
-	this.url = "http://localhost/";
+	this.url = "http://web.symfony-app3.jahman/";
 }
 
 Google.prototype = new Webpage();

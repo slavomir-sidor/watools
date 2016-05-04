@@ -5,9 +5,9 @@ var parse = require('url-parse');
 var util = require('util');
 var stringify = require('node-stringify');
 
-AmazonCategoriesPage = function()
+AmazonCategoriesPage = function(url)
 {
-	this.url = "http://www.amazon.com/gp/site-directory/ref=nav_shopall_btn";
+	this.url = url;
 	this.categories = new Array();
 }
 
@@ -18,15 +18,14 @@ AmazonCategoriesPage.prototype.processPage = function(callback)
 	Webpage.prototype.processPage.call(this, callback);
 
 	var self = this;
-
 	var categories = this.getPage().evaluate(
 			function()
 			{
 				var groups = $(".popover-grouping");
-				
+
 				var main = new Array();
-				var alphabet = new Array('#', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
-						'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z');
+				var alphabet = new Array('#', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
+						'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z');
 
 				$.each(groups, function(index, value)
 				{
@@ -89,7 +88,6 @@ AmazonCategoriesPage.prototype.processPage = function(callback)
 						{
 							console.log('AmazonCategoryBrandsPage.API worker: ' + data.command);
 							console.log('AmazonCategoryBrandsPage.API worker args:  ' + data.args);
-
 							console.log('AmazonCategoryBrandsPage.API done.');
 						},
 
@@ -102,8 +100,6 @@ AmazonCategoriesPage.prototype.processPage = function(callback)
 					console.log('AmazonCategoryBrandsPage.API CALL');
 
 					var ajax = $.ajax(brandsSettings);
-
-					console.log(ajax);
 				};
 
 				var processCategory = function()
@@ -115,7 +111,7 @@ AmazonCategoriesPage.prototype.processPage = function(callback)
 
 					var category = main[i];
 
-					console.log('Category [i] : ' + i);
+					console.log('Category.index : ' + i);
 					console.log('Category.Name : ' + category.Name);
 
 					if (category.Url)
@@ -127,6 +123,7 @@ AmazonCategoriesPage.prototype.processPage = function(callback)
 							return s;
 						}, {}).node;
 					}
+
 					console.log('Category.Url : ' + category.Url);
 					console.log('Category.AmazonCode : ' + category.AmazonCode);
 
@@ -150,6 +147,7 @@ AmazonCategoriesPage.prototype.processPage = function(callback)
 							{
 								Name : category.Name
 							},
+
 							data : category
 						},
 
@@ -160,6 +158,7 @@ AmazonCategoriesPage.prototype.processPage = function(callback)
 						success : function(data)
 						{
 							console.log('Category.API done ' + data._id);
+
 							main[i] = data;
 
 							if (data.AmazonCode)

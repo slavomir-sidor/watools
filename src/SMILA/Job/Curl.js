@@ -5,7 +5,7 @@ var args = system.args;
 CURL = function()
 {
 	this.page;
-	this.url = 'http://localhost/';
+	this.url = 'http://web.symfony-app3.jahman/';
 
 	this.pageViewportSize =
 	{
