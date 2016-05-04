@@ -13,7 +13,6 @@ BlackBoard = function(name)
 	this.name = name;
 	this.uristring = 'mongodb://localhost/' + this.name;
 	this.mongoose = mongoose;
-	this.mongooseQ = mongooseQ;
 
 	var self = this;
 
