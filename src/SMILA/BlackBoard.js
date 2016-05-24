@@ -61,6 +61,12 @@ BlackBoard.prototype.getRecords = function(model, data, limit,offset, callback)
 	entity.find(data, callback).skip(offset).limit(limit);
 };
 
+BlackBoard.prototype.exportRecords = function(model, data, limit, offset, callback)
+{
+	var entity = this.mongoose.model(model);
+	entity.find(data, callback).skip(offset).limit(limit);
+};
+
 BlackBoard.prototype.getRecordsCount = function(model, data, callback)
 {
 	var entity = this.mongoose.model(model);
@@ -70,7 +76,7 @@ BlackBoard.prototype.getRecordsCount = function(model, data, callback)
 BlackBoard.prototype.saveRecord = function(model, query, data, callback)
 {
 	var entity = this.mongoose.model(model);
-
+	console.log(data);
 	entity.findOneAndUpdate(query, data,
 	{
 		new:true,

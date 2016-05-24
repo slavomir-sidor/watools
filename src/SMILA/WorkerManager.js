@@ -70,8 +70,6 @@ WorkerManager.prototype.runProcess = function()
 	{
 		var self = this;
 
-		console.log('Process count: ' + this.getProcessesCount());
-
 		while (this.getProcessesCount() < this.maxThreads && this.tasks.length > 0)
 		{
 			var process = this.tasks.shift();

@@ -28,6 +28,7 @@ SMILA = function(name, port, maxThreads)
 		maxThreads = 5;
 	}
 	this.port = 3005;
+	
 	if (!port && 'PORT' in process.env)
 	{
 		self.port = process.env.PORT;
@@ -217,7 +218,108 @@ SMILA.prototype.start = function()
 			var offset=(page-1)*limit;
 			var total=data;
 			var pages=Math.ceil(total/limit);
+
+			self.blackBoard.getRecords(req.params.model, req.body, limit ,offset, function(err, records)
+					{
+						var result={
+								paggination:{
+									total: data,
+									pages:pages,
+									page:page,
+									limit:limit,
+									count:records.length,
+									offset:offset
+								},
+								records:records
+						};
+					});
 			
+		});
+	});
+	
+	/**
+	 * Blackboard Records
+	 */
+	this.app.get('/blackboard/record/:model-:offset-:limit.:format', function(req, res)
+	{
+		var recordsCount=self.blackBoard.getRecordsCount(req.params.model, req.body, function(err,data){
+
+			var total=data;
+			var limit=req.params.limit;
+			var offset=req.params.offset;
+			var pages=Math.ceil(total/limit);
+			var page=Math.ceil(offset/limit);
+			var model=req.params.model;
+
+			self.blackBoard.exportRecords(model, req.body, limit ,offset, function(err, records)
+					{
+						var result={
+
+								paggination:{
+									total: data,
+									pages:pages,
+									page:page,
+									limit:limit,
+									count:records.length,
+									offset:offset
+								},
+								
+								model:model,
+
+								records:records
+						};
+
+						var format=req.params.format;
+						
+						if(!format)
+						{
+							format='csv';
+						}
+
+						switch(format)
+						{
+							case 'csv':
+								res.set('Content-Type', 'text/plain');
+
+								var output="";
+								
+								for(var record in records)
+								{
+									for(var columns in records[record])
+									{
+										output+=columns+'\n';
+									}
+								}
+
+								res.send(output);
+
+								
+								break;
+							
+							default:
+								res.json(result);
+								break;
+						}
+
+						// res.csv(result);
+					});
+			
+		});
+	});
+
+	/**
+	 * Blackboard
+	 */
+	this.app.get('/blackboard/record/:model/page/:page', function(req, res)
+	{
+		var recordsCount=self.blackBoard.getRecordsCount(req.params.model, req.body, function(err,data){
+
+			var page=req.params.page;
+			var limit=10;
+			var offset=(page-1)*limit;
+			var total=data;
+			var pages=Math.ceil(total/limit);
+
 			self.blackBoard.getRecords(req.params.model, req.body, limit ,offset, function(err, records)
 					{
 						var result={

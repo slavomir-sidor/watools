@@ -86,18 +86,14 @@ AmazonCategoriesPage.prototype.processPage = function(callback)
 
 						success : function(data)
 						{
-							console.log('AmazonCategoryBrandsPage.API worker: ' + data.command);
-							console.log('AmazonCategoryBrandsPage.API worker args:  ' + data.args);
-							console.log('AmazonCategoryBrandsPage.API done.');
+							
 						},
 
 						error : function(data)
 						{
-							console.log('AmazonCategoryBrandsPage.API CALL error' + data);
+
 						}
 					};
-
-					console.log('AmazonCategoryBrandsPage.API CALL');
 
 					var ajax = $.ajax(brandsSettings);
 				};
@@ -111,9 +107,6 @@ AmazonCategoriesPage.prototype.processPage = function(callback)
 
 					var category = main[i];
 
-					console.log('Category.index : ' + i);
-					console.log('Category.Name : ' + category.Name);
-
 					if (category.Url)
 					{
 						category.AmazonCode = category.Url.split('&').reduce(function(s, c)
@@ -124,18 +117,13 @@ AmazonCategoriesPage.prototype.processPage = function(callback)
 						}, {}).node;
 					}
 
-					console.log('Category.Url : ' + category.Url);
-					console.log('Category.AmazonCode : ' + category.AmazonCode);
-
 					if (category.Parent)
 					{
 						parentI = parseInt(category.Parent);
 						var parentCategory = main[parentI];
 						category.Parent = parentCategory._id;
-						console.log('Category.Parent._id : ' + parentCategory._id);
 					}
-
-					console.log('Category.API call');
+					console.log(category);
 
 					var settings =
 					{
@@ -157,7 +145,6 @@ AmazonCategoriesPage.prototype.processPage = function(callback)
 
 						success : function(data)
 						{
-							console.log('Category.API done ' + data._id);
 
 							main[i] = data;
 

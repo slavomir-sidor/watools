@@ -38,16 +38,17 @@ AmazonBrandProductsPage.prototype.processPage = function(callback)
 			var productCount = productCountRe.exec(brandText);
 			var brandUrl = 'http://www.amazon.com/' + brandElement.attr('href');
 
-			var index = brands.push(
+			var brand =
 			{
 				Name : brandText,
 				Categories : new Array(),
 				Url : brandUrl,
 				ProductCount : 0
-			});
+			};
+			console.log(brand);
+			var index = brands.push(brand);
 		});
 
-		console.log('Found ' + brands.length + ' brands.');
 		processBrand();
 	});
 
